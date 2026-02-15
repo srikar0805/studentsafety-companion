@@ -16,19 +16,33 @@ The design emphasizes:
 
 ```mermaid
 graph TB
-    User[User Interface] --> Orchestrator[Agent Orchestrator]
-    Orchestrator --> CM[Conversation Manager Agent]
-    Orchestrator --> SIA[Safety Intelligence Analyst Agent]
-    Orchestrator --> RA[Route Advisor Agent]
+    %% Frontend Layer
+    User[User Interface / Mobile App] <--> Orchestrator[Agent Orchestrator]
+
+    %% Agent Layer
+    Orchestrator <--> CM[Conversation Manager Agent]
+    Orchestrator <--> SIA[Safety Intelligence Analyst Agent]
+    Orchestrator <--> RA[Route Advisor Agent]
     
+    %% Conversation Tools
     CM --> Geocoder[Geocoding Service]
-    SIA --> CrimeDB[(Crime Dataset)]
-    SIA --> TrafficDB[(Traffic Stops Dataset)]
-    SIA --> OSM[(OpenStreetMap API)]
+    CM --> UserDB[(User Profile DB)]
+    
+    %% Safety Analysis Tools (The SQL Layer)
+    SIA --> PostGIS[(PostgreSQL + PostGIS)]
+    
+    %% Note: PostGIS contains the Crime, Traffic, and Infrastructure Tables
+    
+    %% Routing Tools
     RA --> OSRM[OSRM Routing API]
     
-    RA --> MapUI[Map Visualization]
-    MapUI --> User
+    %% External Data Sources (Ingested by DB/OSRM)
+    PostGIS -.-> CrimeSrc[Crime Datasets]
+    PostGIS -.-> TrafficSrc[Traffic Data]
+    OSRM -.-> OSM[OpenStreetMap Data]
+
+    %% Feedback Loop
+    RA -- "Route + Safety Metadata" --> Orchestrator
 ```
 
 ### Agent Communication Flow
