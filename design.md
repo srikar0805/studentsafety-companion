@@ -74,15 +74,18 @@ You are the Conversation Manager for Campus Dispatch Copilot, a safety navigatio
 
 Your role:
 1. Extract origin and destination locations from user messages
-2. Identify user priorities (safety, speed, or balanced)
-3. Detect safety concerns or time constraints
-4. Ask clarifying questions when information is ambiguous
-5. Maintain conversation context across multiple turns
+2. Identify user mode: "Student" or "Community". 
+   - IF Student: Default priority is 'safety'. Enforce stricter routing rules.
+   - IF Community: Default priority is 'balanced'.
+3. Identify user priorities (safety, speed, or balanced)
+4. Detect safety concerns or time constraints
+5. Ask clarifying questions when information is ambiguous
 
 When you extract locations and priorities, format your response as:
 {
   "origin": "location name or coordinates",
   "destination": "location name or coordinates",
+  "user_mode": "student" | "community",
   "priority": "safety" | "speed" | "balanced",
   "time": "current" | "future time",
   "concerns": ["list of expressed concerns"]
@@ -102,6 +105,7 @@ If information is missing or ambiguous, ask the user for clarification before pr
 interface RouteRequest {
   origin: Coordinates;
   destination: Coordinates;
+  user_mode: "student" | "community";
   priority: "safety" | "speed" | "balanced";
   time: DateTime;
   concerns: string[];
@@ -121,7 +125,7 @@ Your role:
 2. Analyze patrol patterns from traffic stop data
 3. Identify safety infrastructure (emergency phones, lighting)
 4. Calculate risk scores using the specified algorithm
-5. Provide factual safety assessments without speculation
+5. Generate "Actionable Safety Tips" based on crime types (e.g., "High theft area: Hide valuables")
 
 Risk Calculation Formula:
 - Base score: 10 points per incident within 500m
@@ -132,6 +136,12 @@ Risk Calculation Formula:
 - High patrol frequency: -10 points
 - Final score clamped to 0-100 range
 
+Safety Tip Logic:
+- If >3 Thefts in area: Suggest hiding jewelry/phones.
+- If >1 Assault/Kidnapping: Suggest staying in groups or avoiding area entirely.
+- If Community Mode: Focus warnings on Vehicle Theft/Burglary.
+- If Student Mode: Focus warnings on Personal Safety/Harassment.
+
 Always cite specific data points in your analysis.
 ```
 
@@ -140,11 +150,13 @@ Always cite specific data points in your analysis.
 - `query_traffic_stops(route_geometry: LineString, radius_m: int) -> PatrolData`
 - `query_osm_infrastructure(route_geometry: LineString, radius_m: int) -> Infrastructure`
 - `calculate_risk_score(incidents: List[Incident], infrastructure: Infrastructure, time: DateTime) -> RiskScore`
+- `generate_safety_tips(incidents: List[Incident], mode: str) -> List[SafetyTip]`
 
 **Input**: Route geometry and analysis parameters
 ```typescript
 interface AnalysisRequest {
   route_geometry: LineString;
+  user_mode: "student" | "community";
   current_time: DateTime;
   spatial_radius: number; // meters
   temporal_window: number; // days
@@ -160,7 +172,14 @@ interface SafetyAnalysis {
   emergency_phones: number;
   lighting_quality: "good" | "moderate" | "poor";
   patrol_frequency: "high" | "moderate" | "low";
+  actionable_tips: SafetyTip[]; // Added: Specific advice strings
   contributing_factors: string[];
+}
+
+interface SafetyTip {
+  type: "warning" | "advisory";
+  message: string; // e.g. "Don't carry valuable jewelry here"
+  trigger_crime: string; // e.g. "Larceny"
 }
 ```
 
@@ -175,14 +194,19 @@ You are the Route Advisor for Campus Dispatch Copilot.
 Your role:
 1. Generate multiple walking route options using OSRM
 2. Rank routes based on user priorities
-3. Create natural language explanations for recommendations
-4. Cite specific data points from safety analysis
-5. Present trade-offs clearly (safety vs speed)
+3. Calculate "Safety Percentage Improvement" vs the fastest route
+4. Create natural language explanations for recommendations
+5. Cite specific data points from safety analysis
+6. Present trade-offs clearly (safety vs speed)
 
 Ranking Logic:
 - Safety priority: Sort by risk_score (ascending)
 - Speed priority: Sort by duration (ascending)
 - Balanced priority: Sort by weighted score (0.6 * normalized_risk + 0.4 * normalized_duration)
+
+Comparison Logic:
+- Calculate how much safer the recommended route is compared to the shortest path.
+- Format: "This route is X% safer but takes Y minutes longer."
 
 Your explanations should:
 - State the recommendation clearly
@@ -221,6 +245,8 @@ interface RankedRoute {
   safety_analysis: SafetyAnalysis;
   duration_minutes: number;
   distance_meters: number;
+  safety_improvement_percent: number; // Added: e.g. 40 (40% safer)
+  time_tradeoff_minutes: number;      // Added: e.g. 5 (5 mins slower)
   explanation: string;
 }
 ```
@@ -392,6 +418,7 @@ CREATE INDEX idx_route_expires ON route_cache(expires_at);
 ```json
 {
   "request_id": "uuid",
+  "user_mode": "student",
   "routes": [
     {
       "id": "route_1",
@@ -423,6 +450,13 @@ CREATE INDEX idx_route_expires ON route_cache(expires_at);
         "infrastructure_adjustment": -10,
         "patrol_adjustment": -10
       },
+      "actionable_tips": [
+          {
+              "type": "advisory",
+              "message": "Low theft area, but keep phones secure.",
+              "trigger_crime": "Theft"
+          }
+      ],
       "incident_count": 0,
       "recent_incidents": [],
       "emergency_phones": 2,
@@ -450,7 +484,9 @@ CREATE INDEX idx_route_expires ON route_cache(expires_at);
       "distance_meters": 850,
       "risk_score": 15,
       "risk_level": "Very Safe",
-      "explanation": "I recommend taking the longer route via Conley Avenue. Here's why: This path is well-lit with 2 emergency call boxes along the way. Zero incidents have been reported within 500m in the past 30 days. The area has high police patrol frequency."
+      "safety_improvement_percent": 45,
+      "time_tradeoff_minutes": 2,
+      "explanation": "I recommend taking the longer route via Conley Avenue. Here's why: This path is well-lit with 2 emergency call boxes. It is 45% safer than the shortest route based on historical data."
     },
     "alternative_routes": [
       {
@@ -460,10 +496,10 @@ CREATE INDEX idx_route_expires ON route_cache(expires_at);
         "distance_meters": 650,
         "risk_score": 65,
         "risk_level": "Moderate Risk",
-        "explanation": "This shortcut through the parking lot is 2 minutes faster but has higher risk. One theft was reported last week nearby, and the area has poor lighting."
+        "explanation": "This shortcut through the parking lot is 2 minutes faster but has higher risk. One theft was reported last week nearby."
       }
     ],
-    "comparison": "Route A takes 2 minutes longer but offers significantly better safety conditions. Given that it's 11pm, I recommend prioritizing the safer route."
+    "comparison": "Route A takes 2 minutes longer but is 45% safer based on crime density. Given that it's 11pm, I recommend prioritizing the safer route."
   }
 }
 ```
@@ -644,6 +680,43 @@ def apply_infrastructure_adjustments(
     
     # Clamp to 0-100 range
     return max(0, min(100, adjusted_score))
+```
+
+**Step 5: Context-Aware Safety Tips Logic**
+```python
+def generate_context_aware_tips(incidents: List[Incident], user_mode: str) -> List[SafetyTip]:
+    """
+    Generate actionable advice based on dominant crime types and user mode.
+    """
+    tips = []
+    # Cluster crimes by type
+    crime_counts = count_by_type(incidents)
+    
+    # Logic for Student Mode
+    if user_mode == "student":
+        if crime_counts.get('Theft', 0) > 2:
+            tips.append({
+                "type": "advisory",
+                "message": "High theft reports in this area. Please keep jewelry and phones hidden.",
+                "trigger_crime": "Theft"
+            })
+        if crime_counts.get('Assault', 0) > 0 or crime_counts.get('Kidnapping', 0) > 0:
+            tips.append({
+                "type": "warning",
+                "message": "Critical: High risk incidents reported. Do not walk alone here.",
+                "trigger_crime": "Personal Safety"
+            })
+
+    # Logic for Community Mode
+    if user_mode == "community":
+        if crime_counts.get('Burglary', 0) > 2:
+            tips.append({
+                "type": "advisory",
+                "message": "Residential burglary alerts in this zone. Ensure home windows are locked.",
+                "trigger_crime": "Burglary"
+            })
+
+    return tips
 ```
 
 **Complete Algorithm**:
