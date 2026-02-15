@@ -1,0 +1,13 @@
+# System Files
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Local Data
+# Ignore massive OSM files (>100MB) preventing git push
+data/osm/*.osm.pbf
+
+# Allow other data (CSVs, GeoJSONs, PDFs)
+!data/
