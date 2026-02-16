@@ -10,25 +10,7 @@ export interface Incident {
 }
 
 export interface EmergencyPhone {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    id: string;
-    location: Coordinates;
-    name: string;
-=======
     id?: string;
     location: Coordinates;
     name?: string;
->>>>>>> Stashed changes
-=======
-    id?: string;
-    location: Coordinates;
-    name?: string;
->>>>>>> Stashed changes
-=======
-    id?: string;
-    location: Coordinates;
-    name?: string;
->>>>>>> Stashed changes
 }

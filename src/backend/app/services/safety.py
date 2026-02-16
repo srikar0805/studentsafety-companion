@@ -38,19 +38,6 @@ def apply_infrastructure_adjustments(
     lighting_quality: str,
     patrol_frequency: str,
 ) -> float:
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    phone_adjustment = min(emergency_phones * -5, -15)
-    lighting_adjustment = {"good": 0, "moderate": 5, "poor": 10}[lighting_quality]
-    patrol_adjustment = {"high": -10, "moderate": 0, "low": 5}[patrol_frequency]
-    adjusted = score + phone_adjustment + lighting_adjustment + patrol_adjustment
-    return max(0.0, min(100.0, adjusted))
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     components = infrastructure_adjustment_components(
         emergency_phones,
         lighting_quality,
@@ -75,13 +62,6 @@ def infrastructure_adjustment_components(
         "patrol_adjustment": float(patrol_adjustment),
         "total_adjustment": float(total_adjustment),
     }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 
 def patrol_frequency_label(stop_count: int) -> str:
