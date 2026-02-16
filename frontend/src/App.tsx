@@ -13,6 +13,10 @@ import { useStore } from './hooks/useStore';
 import { MessageSquare, Map as MapIcon, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+import { sendDispatchMessage, fetchRoutes } from './services/api';
+>>>>>>> Stashed changes
 =======
 import { sendDispatchMessage, fetchRoutes } from './services/api';
 >>>>>>> Stashed changes
@@ -22,11 +26,14 @@ const App: React.FC = () => {
   const {
     messages, addMessage, isTyping, setIsTyping,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     routes, selectedRouteId, setSelectedRouteId,
     isDarkMode, toggleDarkMode,
     incidents,
     emergencyPhones: phones
 =======
+=======
+>>>>>>> Stashed changes
     routes, selectedRouteId, setSelectedRouteId, setRoutes,
     isDarkMode, toggleDarkMode,
     incidents,
@@ -34,6 +41,9 @@ const App: React.FC = () => {
     setIncidents,
     setEmergencyPhones,
     userLocation
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   } = useStore();
 
@@ -45,7 +55,12 @@ const App: React.FC = () => {
   }, [isDarkMode]);
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   const handleSendMessage = (text: string) => {
+=======
+  const handleSendMessage = async (text: string) => {
+    // Add user message
+>>>>>>> Stashed changes
 =======
   const handleSendMessage = async (text: string) => {
     // Add user message
@@ -57,6 +72,7 @@ const App: React.FC = () => {
       timestamp: new Date()
     });
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     // Simulate AI response
     setIsTyping(true);
@@ -70,6 +86,8 @@ const App: React.FC = () => {
       });
     }, 3000);
 =======
+=======
+>>>>>>> Stashed changes
     // Show loading state
     setIsTyping(true);
 
@@ -141,6 +159,9 @@ const App: React.FC = () => {
 
       console.error('Dispatch API error:', error);
     }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   };
 

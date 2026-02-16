@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { ChevronDown, ChevronUp, Info, AlertCircle, Phone, Shield } from 'lucide-react';
+=======
+import { ChevronDown, ChevronUp, Map as MapIcon, AlertCircle, Phone, Shield } from 'lucide-react';
+>>>>>>> Stashed changes
 =======
 import { ChevronDown, ChevronUp, Map as MapIcon, AlertCircle, Phone, Shield } from 'lucide-react';
 >>>>>>> Stashed changes
@@ -11,6 +15,7 @@ export const MapLegend: React.FC = () => {
     return (
         <div style={{
             position: 'absolute',
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
             bottom: '24px',
             left: '24px',
@@ -23,6 +28,8 @@ export const MapLegend: React.FC = () => {
             overflow: 'hidden',
             transition: 'all 0.3s ease'
 =======
+=======
+>>>>>>> Stashed changes
             bottom: '20px',
             left: '20px',
             zIndex: 1000,
@@ -35,13 +42,20 @@ export const MapLegend: React.FC = () => {
             overflow: 'hidden',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             fontFamily: "'Outfit', sans-serif"
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         }}>
             <div
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 style={{
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                     padding: '10px 14px',
+=======
+                    padding: '12px 16px',
+>>>>>>> Stashed changes
 =======
                     padding: '12px 16px',
 >>>>>>> Stashed changes
@@ -49,6 +63,7 @@ export const MapLegend: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     cursor: 'pointer',
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                     borderBottom: isCollapsed ? 'none' : '1px solid var(--color-gray-100)',
                     backgroundColor: 'var(--color-gray-50)'
@@ -80,6 +95,8 @@ export const MapLegend: React.FC = () => {
                                     <div style={{ width: '12px', height: '12px', borderRadius: '2px', backgroundColor: item.color }} />
                                     <span style={{ fontSize: '11px', color: 'var(--color-gray-700)' }}>{item.label}</span>
 =======
+=======
+>>>>>>> Stashed changes
                     backgroundColor: 'transparent'
                 }}
             >
@@ -110,12 +127,16 @@ export const MapLegend: React.FC = () => {
                                 <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                     <div style={{ width: '24px', height: '4px', borderRadius: '2px', backgroundColor: item.color }} />
                                     <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>{item.label}</span>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                                 </div>
                             ))}
                         </div>
                     </div>
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                     <div style={{ borderTop: '1px solid var(--color-gray-100)', paddingTop: '10px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -131,6 +152,8 @@ export const MapLegend: React.FC = () => {
                                 <div style={{ color: 'var(--color-brand-blue)' }}><Shield size={14} /></div>
                                 <span style={{ fontSize: '11px', color: 'var(--color-gray-700)' }}>High Patrol Area</span>
 =======
+=======
+>>>>>>> Stashed changes
                     <div style={{ borderTop: '1px solid var(--color-border-subtle)', paddingTop: '14px' }}>
                         <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             Markers
@@ -147,6 +170,9 @@ export const MapLegend: React.FC = () => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <div style={{ color: '#2563eb', opacity: 0.6 }}><Shield size={14} /></div>
                                 <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>High Patrol Area</span>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                             </div>
                         </div>

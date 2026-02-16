@@ -5,7 +5,12 @@ import uuid
 from datetime import datetime
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 from fastapi import FastAPI
+=======
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+>>>>>>> Stashed changes
 =======
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,10 +32,13 @@ from .services.ranking import build_ranked_routes, rank_routes
 from .services.safety import analyze_route_safety, patrol_frequency_label
 from .utils import parse_request_time
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 logger = logging.getLogger("campus_dispatch")
 logging.basicConfig(level=logging.INFO)
 =======
+=======
+>>>>>>> Stashed changes
 from .schemas.agent_schemas import AgentRequest
 from .agents.coordinator_agent import CoordinatorAgent
 from .clients.archia_client import call_archia
@@ -39,13 +47,19 @@ from .tools import router as tools_router
 
 logger = logging.getLogger("campus_dispatch")
 logging.basicConfig(level=logging.DEBUG)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 app = FastAPI(title="Campus Dispatch Copilot API")
 cache = get_cache()
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 # Configure CORS for frontend access
 app.add_middleware(
     CORSMiddleware,
@@ -64,6 +78,9 @@ app.add_middleware(
 app.include_router(mcp_router)
 app.include_router(tools_router)
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 @app.get("/health")
@@ -197,7 +214,10 @@ def get_routes(request: RouteRequest):
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 @app.post("/api/v1/agent/analyze")
 async def analyze_agent(request: AgentRequest):
     """
@@ -226,6 +246,9 @@ async def dispatch_agent(request: AgentRequest):
     return result
 
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 def build_comparison_text(primary, ranked_routes):
     if len(ranked_routes) < 2:

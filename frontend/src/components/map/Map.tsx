@@ -1,13 +1,19 @@
 import React, { useEffect } from 'react';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import { useStore } from '../../hooks/useStore';
 import { createIncidentIcon, createEmergencyPhoneIcon } from './Markers';
 =======
+=======
+>>>>>>> Stashed changes
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import { useStore } from '../../hooks/useStore';
 import { createIncidentIcon, createEmergencyPhoneIcon, createClusterIcon } from './Markers';
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 import { getSafetyDetails } from '../../utils/formatters';
 import type { RankedRoute } from '../../types/route';
@@ -15,7 +21,13 @@ import type { Incident, EmergencyPhone } from '../../types/incident';
 import { MapLegend } from './MapLegend';
 import { ConditionsBanner } from './ConditionsBanner';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import 'leaflet/dist/leaflet.css';
+=======
+import { ZoomControl, LocateControl, FullscreenControl, LayerControl } from './MapControls';
+import 'leaflet/dist/leaflet.css';
+import './map.css';
+>>>>>>> Stashed changes
 =======
 import { ZoomControl, LocateControl, FullscreenControl, LayerControl } from './MapControls';
 import 'leaflet/dist/leaflet.css';
@@ -31,8 +43,13 @@ interface MapProps {
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRouteId, incidents, phones }) => {
     const { userLocation } = useStore();
+=======
+export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRouteId, incidents: rawIncidents, phones: rawPhones }) => {
+    const { userLocation, layerVisibility } = useStore();
+>>>>>>> Stashed changes
 =======
 export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRouteId, incidents: rawIncidents, phones: rawPhones }) => {
     const { userLocation, layerVisibility } = useStore();
@@ -61,7 +78,11 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
             setAnimatedPath(fullPath.slice(0, currentIndex + 1));
             currentIndex++;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         }, 30);
+=======
+        }, 15);
+>>>>>>> Stashed changes
 =======
         }, 15);
 >>>>>>> Stashed changes
@@ -71,6 +92,7 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
 
     const center: [number, number] = userLocation
         ? [userLocation.latitude, userLocation.longitude]
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
         : [38.9446, -92.3266];
 
@@ -148,6 +170,8 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
                                     />
                                 </>
 =======
+=======
+>>>>>>> Stashed changes
         : [38.9404, -92.3277];
 
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -287,12 +311,16 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
                                     pathOptions={{ color, weight: 8, opacity: 1, lineCap: 'round', lineJoin: 'round' }}
                                     className="route-polyline--selected"
                                 />
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                             )}
                         </React.Fragment>
                     );
                 })}
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                 {/* Incident Markers */}
                 {incidents.map((incident) => (
@@ -327,6 +355,8 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
                                 <h4 style={{ margin: '0 0 4px 0', color: 'var(--color-primary)' }}>Emergency Blue Light</h4>
                                 <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-primary)' }}>Always active campus security phone.</p>
 =======
+=======
+>>>>>>> Stashed changes
                 {/* Distance Markers */}
                 {distanceMarkers.map((dm, idx) => (
                     <Marker key={idx} position={dm.pos} icon={L.divIcon({
@@ -372,6 +402,9 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
                                 <p style={{ margin: '8px 0', fontSize: '12px' }}>
                                     {phone.name ? `${phone.name} • ` : ''}Direct line to Security Dispatch.
                                 </p>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                             </div>
                         </Popup>

@@ -5,7 +5,11 @@ import { AlertCircle, Phone } from 'lucide-react';
 export const createIncidentIcon = () => {
     const iconHtml = renderToStaticMarkup(
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <div style={{
+=======
+        <div className="marker-incident--pulse" style={{
+>>>>>>> Stashed changes
 =======
         <div className="marker-incident--pulse" style={{
 >>>>>>> Stashed changes
@@ -18,15 +22,21 @@ export const createIncidentIcon = () => {
             alignItems: 'center',
             justifyContent: 'center',
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             border: '2px solid white',
             boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
         }}>
             <AlertCircle size={18} />
 =======
+=======
+>>>>>>> Stashed changes
             border: '3px solid white',
             boxShadow: '0 2px 8px rgba(239, 68, 68, 0.4)'
         }}>
             <AlertCircle size={20} fill="rgba(255,255,255,0.2)" />
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         </div>
     );
@@ -34,7 +44,11 @@ export const createIncidentIcon = () => {
     return L.divIcon({
         html: iconHtml,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         className: '',
+=======
+        className: 'custom-marker',
+>>>>>>> Stashed changes
 =======
         className: 'custom-marker',
 >>>>>>> Stashed changes
@@ -56,14 +70,20 @@ export const createEmergencyPhoneIcon = () => {
             justifyContent: 'center',
             border: '2px solid white',
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             boxShadow: '0 0 10px var(--color-brand-blue)',
         }}>
             <Phone size={18} />
 =======
+=======
+>>>>>>> Stashed changes
             boxShadow: '0 2px 4px rgba(37, 99, 235, 0.3)',
             outline: '2px solid rgba(16, 185, 129, 0.4)'
         }}>
             <Phone size={18} fill="currentColor" />
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         </div>
     );
@@ -71,11 +91,14 @@ export const createEmergencyPhoneIcon = () => {
     return L.divIcon({
         html: iconHtml,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         className: '',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
     });
 =======
+=======
+>>>>>>> Stashed changes
         className: 'custom-marker',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
@@ -87,5 +110,8 @@ export const createEmergencyPhoneIcon = () => {
         iconSize: [36, 36],
         iconAnchor: [18, 18],
     });
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 };

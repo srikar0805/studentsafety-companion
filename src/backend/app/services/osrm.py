@@ -12,13 +12,19 @@ class OsrmError(RuntimeError):
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def generate_routes(origin: Coordinates, destination: Coordinates) -> list[Route]:
 =======
+=======
+>>>>>>> Stashed changes
 def generate_routes(
     origin: Coordinates,
     destination: Coordinates,
     alternatives: int | None = None,
 ) -> list[Route]:
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     base = settings.osrm_base_url.rstrip("/")
     url = (
@@ -27,15 +33,21 @@ def generate_routes(
         f"{destination.longitude},{destination.latitude}"
     )
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     params = {
         "alternatives": settings.max_route_alternatives,
 =======
+=======
+>>>>>>> Stashed changes
     max_alts = settings.max_route_alternatives
     if alternatives is not None:
         max_alts = max(0, min(int(alternatives), settings.max_route_alternatives))
 
     params = {
         "alternatives": max_alts,
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         "steps": "true",
         "geometries": "geojson",
