@@ -162,3 +162,34 @@ CREATE TABLE IF NOT EXISTS knowledge_base (
 
 -- HNSW Index for fast similarity search
 CREATE INDEX IF NOT EXISTS idx_rag_embedding ON knowledge_base USING hnsw (embedding vector_l2_ops);
+
+-- 11. OSM Infrastructure Cache (optional enrichment)
+CREATE TABLE IF NOT EXISTS osm_infrastructure (
+    id SERIAL PRIMARY KEY,
+    feature_type VARCHAR(50) NOT NULL, -- 'emergency_phone', 'lighting', 'sidewalk'
+    geometry GEOGRAPHY NOT NULL,
+    properties JSONB,
+    last_updated TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_osm_geometry ON osm_infrastructure USING GIST(geometry);
+CREATE INDEX IF NOT EXISTS idx_osm_type ON osm_infrastructure(feature_type);
+
+
+-- 12. Route Cache Table (optional DB cache for OSRM responses)
+CREATE TABLE IF NOT EXISTS route_cache (
+    id SERIAL PRIMARY KEY,
+    origin_lat DECIMAL(10, 8) NOT NULL,
+    origin_lon DECIMAL(11, 8) NOT NULL,
+    dest_lat DECIMAL(10, 8) NOT NULL,
+    dest_lon DECIMAL(11, 8) NOT NULL,
+    route_geometry GEOGRAPHY(LINESTRING, 4326) NOT NULL,
+    distance_meters INTEGER NOT NULL,
+    duration_seconds INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_route_origin ON route_cache(origin_lat, origin_lon);
+CREATE INDEX IF NOT EXISTS idx_route_expires ON route_cache(expires_at);
+
