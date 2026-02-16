@@ -4,7 +4,12 @@ import logging
 import uuid
 from datetime import datetime
 
+<<<<<<< Updated upstream
 from fastapi import FastAPI
+=======
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+>>>>>>> Stashed changes
 from fastapi.responses import JSONResponse
 
 from .cache import get_cache
@@ -21,13 +26,45 @@ from .services.queries import (
 from .services.ranking import build_ranked_routes, rank_routes
 from .services.safety import analyze_route_safety, patrol_frequency_label
 from .utils import parse_request_time
+<<<<<<< Updated upstream
 
 logger = logging.getLogger("campus_dispatch")
 logging.basicConfig(level=logging.INFO)
+=======
+from .schemas.agent_schemas import AgentRequest
+from .agents.coordinator_agent import CoordinatorAgent
+from .clients.archia_client import call_archia
+from .mcp.routes import router as mcp_router
+from .tools import router as tools_router
+
+logger = logging.getLogger("campus_dispatch")
+logging.basicConfig(level=logging.DEBUG)
+>>>>>>> Stashed changes
 
 app = FastAPI(title="Campus Dispatch Copilot API")
 cache = get_cache()
 
+<<<<<<< Updated upstream
+=======
+# Configure CORS for frontend access
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite default dev server
+        "http://localhost:5174",  # Vite alternate port
+        "http://localhost:3000",  # Alternative dev port
+        "http://localhost:8080",  # Alternative dev port
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include MCP tool endpoints (called by Archia agents)
+app.include_router(mcp_router)
+app.include_router(tools_router)
+
+>>>>>>> Stashed changes
 
 @app.get("/health")
 def health_check():
@@ -159,6 +196,37 @@ def get_routes(request: RouteRequest):
     )
 
 
+<<<<<<< Updated upstream
+=======
+@app.post("/api/v1/agent/analyze")
+async def analyze_agent(request: AgentRequest):
+    """
+    Agentic analysis endpoint that orchestrates multiple agents to handle
+    natural language navigation queries.
+    """
+    coordinator = CoordinatorAgent()
+    result = await coordinator.run({"message": request.message})
+    return result
+
+
+@app.post("/api/v1/dispatch")
+async def dispatch_agent(request: AgentRequest):
+    """
+    Proxy to the Archia-hosted agent runtime.
+    """
+    try:
+        result = call_archia(
+            request.message,
+            agent_name=settings.archia_agent_name
+        )
+    except Exception as exc:
+        logger.exception("Archia request failed")
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    return result
+
+
+>>>>>>> Stashed changes
 def build_comparison_text(primary, ranked_routes):
     if len(ranked_routes) < 2:
         return "This is the only available route."

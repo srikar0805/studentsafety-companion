@@ -23,7 +23,11 @@ export const RouteCard: React.FC<RouteCardProps> = ({ rankedRoute, isSelected, o
             onClick={() => onSelect(rankedRoute.route.id)}
             role="button"
             tabIndex={0}
+<<<<<<< Updated upstream
             aria-label={`Route via ${rankedRoute.route.id === 'route_1' ? 'Conley Avenue' : 'Parking Lot Shortcut'}, ${duration_minutes} minutes, risk score ${safety_analysis.risk_score} out of 100`}
+=======
+            aria-label={`Route option ${rank}, ${duration_minutes} minutes, risk score ${safety_analysis.risk_score} out of 100`}
+>>>>>>> Stashed changes
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect(rankedRoute.route.id)}
             style={{
                 backgroundColor: isRecommended ? 'rgba(0, 135, 90, 0.02)' : 'var(--color-bg-primary)',
@@ -65,7 +69,11 @@ export const RouteCard: React.FC<RouteCardProps> = ({ rankedRoute, isSelected, o
 
                 <div style={{ flex: 1 }}>
                     <h3 style={{ fontSize: '1.1rem', marginBottom: '4px', color: 'var(--color-gray-900)' }}>
+<<<<<<< Updated upstream
                         Via {rankedRoute.route.id === 'route_1' ? 'Conley Avenue' : 'Parking Lot Shortcut'}
+=======
+                        Route Option {rank}
+>>>>>>> Stashed changes
                     </h3>
 
                     <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: '12px' }}>

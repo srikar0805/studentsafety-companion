@@ -1,0 +1,19 @@
+
+==================================================
+STARTING COMPREHENSIVE AGENT TEST
+==================================================
+
+TEST CASE 1: Safest route from Rollins Hall to Ellis Library at 11pm
+
+COORDINATOR RESPONSE:
+Explanation: I've found 1 routes. The recommended path is optimized for safety. Recent reports: Ellis Library has high security presence during finals week.
+Routes found: 1
+Route ID: route_123
+ETA: 10.0 mins
+Risk Score: 90.0%
+Summary: Recent reports: Ellis Library has high security presence during finals week.
+
+==================================================
+COMPREHENSIVE TEST COMPLETE
+==================================================
+

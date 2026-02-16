@@ -8,8 +8,14 @@ interface RouteComparisonViewProps {
 }
 
 export const RouteComparisonView: React.FC<RouteComparisonViewProps> = ({ recommended, alternative }) => {
+<<<<<<< Updated upstream
     const timeDiff = recommended.duration_minutes - alternative.duration_minutes;
     const safetyImprovement = alternative.safety_analysis.risk_score - recommended.safety_analysis.risk_score;
+=======
+    const timeDiff = recommended.time_tradeoff_minutes ?? (recommended.duration_minutes - alternative.duration_minutes);
+    const safetyImprovement = recommended.safety_improvement_percent
+        ?? (alternative.safety_analysis.risk_score - recommended.safety_analysis.risk_score);
+>>>>>>> Stashed changes
 
     return (
         <div style={{
