@@ -13,8 +13,11 @@ class OsrmError(RuntimeError):
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def generate_routes(origin: Coordinates, destination: Coordinates) -> list[Route]:
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 def generate_routes(
@@ -23,6 +26,9 @@ def generate_routes(
     alternatives: int | None = None,
 ) -> list[Route]:
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -34,9 +40,12 @@ def generate_routes(
     )
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     params = {
         "alternatives": settings.max_route_alternatives,
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     max_alts = settings.max_route_alternatives
@@ -46,6 +55,9 @@ def generate_routes(
     params = {
         "alternatives": max_alts,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

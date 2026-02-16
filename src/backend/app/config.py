@@ -2,7 +2,10 @@ from dataclasses import dataclass
 import os
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 from pathlib import Path
@@ -12,6 +15,9 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent.parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -33,7 +39,10 @@ class Settings:
     )
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     archia_api_key: str | None = os.getenv("ARCHIA_API_KEY")
@@ -48,6 +57,9 @@ class Settings:
     tool_api_key: str | None = os.getenv("TOOL_API_KEY")
     archia_timeout_seconds: int = int(os.getenv("ARCHIA_TIMEOUT_SECONDS", "30"))
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

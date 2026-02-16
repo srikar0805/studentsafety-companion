@@ -25,7 +25,11 @@ export const RouteCard: React.FC<RouteCardProps> = ({ rankedRoute, isSelected, o
             tabIndex={0}
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             aria-label={`Route via ${rankedRoute.route.id === 'route_1' ? 'Conley Avenue' : 'Parking Lot Shortcut'}, ${duration_minutes} minutes, risk score ${safety_analysis.risk_score} out of 100`}
+=======
+            aria-label={`Route option ${rank}, ${duration_minutes} minutes, risk score ${safety_analysis.risk_score} out of 100`}
+>>>>>>> Stashed changes
 =======
             aria-label={`Route option ${rank}, ${duration_minutes} minutes, risk score ${safety_analysis.risk_score} out of 100`}
 >>>>>>> Stashed changes
@@ -75,7 +79,11 @@ export const RouteCard: React.FC<RouteCardProps> = ({ rankedRoute, isSelected, o
                     <h3 style={{ fontSize: '1.1rem', marginBottom: '4px', color: 'var(--color-gray-900)' }}>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                         Via {rankedRoute.route.id === 'route_1' ? 'Conley Avenue' : 'Parking Lot Shortcut'}
+=======
+                        Route Option {rank}
+>>>>>>> Stashed changes
 =======
                         Route Option {rank}
 >>>>>>> Stashed changes

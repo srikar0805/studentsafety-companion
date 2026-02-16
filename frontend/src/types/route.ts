@@ -30,6 +30,11 @@ export interface RankedRoute {
   distance_meters: number;
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+  safety_improvement_percent?: number;
+  time_tradeoff_minutes?: number;
+>>>>>>> Stashed changes
 =======
   safety_improvement_percent?: number;
   time_tradeoff_minutes?: number;

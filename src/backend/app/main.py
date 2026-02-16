@@ -6,7 +6,12 @@ from datetime import datetime
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 from fastapi import FastAPI
+=======
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+>>>>>>> Stashed changes
 =======
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,10 +38,13 @@ from .services.safety import analyze_route_safety, patrol_frequency_label
 from .utils import parse_request_time
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 logger = logging.getLogger("campus_dispatch")
 logging.basicConfig(level=logging.INFO)
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 from .schemas.agent_schemas import AgentRequest
@@ -48,6 +56,9 @@ from .tools import router as tools_router
 logger = logging.getLogger("campus_dispatch")
 logging.basicConfig(level=logging.DEBUG)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -57,7 +68,10 @@ cache = get_cache()
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 # Configure CORS for frontend access
@@ -79,6 +93,9 @@ app.include_router(mcp_router)
 app.include_router(tools_router)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -215,7 +232,10 @@ def get_routes(request: RouteRequest):
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 @app.post("/api/v1/agent/analyze")
@@ -247,6 +267,9 @@ async def dispatch_agent(request: AgentRequest):
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
