@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { ChevronDown, ChevronUp, Info, AlertCircle, Phone, Shield } from 'lucide-react';
+=======
+import { ChevronDown, ChevronUp, Map as MapIcon, AlertCircle, Phone, Shield } from 'lucide-react';
+>>>>>>> Stashed changes
 =======
 import { ChevronDown, ChevronUp, Map as MapIcon, AlertCircle, Phone, Shield } from 'lucide-react';
 >>>>>>> Stashed changes
@@ -22,6 +26,7 @@ export const MapLegend: React.FC = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             bottom: '24px',
             left: '24px',
             zIndex: 1000,
@@ -33,6 +38,8 @@ export const MapLegend: React.FC = () => {
             overflow: 'hidden',
             transition: 'all 0.3s ease'
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -51,6 +58,9 @@ export const MapLegend: React.FC = () => {
             fontFamily: "'Outfit', sans-serif"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -60,6 +70,7 @@ export const MapLegend: React.FC = () => {
             <div
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 style={{
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -73,10 +84,14 @@ export const MapLegend: React.FC = () => {
 =======
                     padding: '12px 16px',
 >>>>>>> Stashed changes
+=======
+                    padding: '12px 16px',
+>>>>>>> Stashed changes
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     cursor: 'pointer',
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -114,6 +129,8 @@ export const MapLegend: React.FC = () => {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
                     backgroundColor: 'transparent'
                 }}
             >
@@ -146,6 +163,9 @@ export const MapLegend: React.FC = () => {
                                     <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>{item.label}</span>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -156,6 +176,7 @@ export const MapLegend: React.FC = () => {
                         </div>
                     </div>
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -173,6 +194,8 @@ export const MapLegend: React.FC = () => {
                                 <div style={{ color: 'var(--color-brand-blue)' }}><Shield size={14} /></div>
                                 <span style={{ fontSize: '11px', color: 'var(--color-gray-700)' }}>High Patrol Area</span>
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -195,6 +218,9 @@ export const MapLegend: React.FC = () => {
                                 <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>High Patrol Area</span>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

@@ -7,7 +7,11 @@ export const createIncidentIcon = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <div style={{
+=======
+        <div className="marker-incident--pulse" style={{
+>>>>>>> Stashed changes
 =======
         <div className="marker-incident--pulse" style={{
 >>>>>>> Stashed changes
@@ -28,11 +32,14 @@ export const createIncidentIcon = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             border: '2px solid white',
             boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
         }}>
             <AlertCircle size={18} />
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -43,6 +50,9 @@ export const createIncidentIcon = () => {
             <AlertCircle size={20} fill="rgba(255,255,255,0.2)" />
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -56,7 +66,11 @@ export const createIncidentIcon = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         className: '',
+=======
+        className: 'custom-marker',
+>>>>>>> Stashed changes
 =======
         className: 'custom-marker',
 >>>>>>> Stashed changes
@@ -86,10 +100,13 @@ export const createEmergencyPhoneIcon = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             boxShadow: '0 0 10px var(--color-brand-blue)',
         }}>
             <Phone size={18} />
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -100,6 +117,9 @@ export const createEmergencyPhoneIcon = () => {
             <Phone size={18} fill="currentColor" />
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -113,11 +133,14 @@ export const createEmergencyPhoneIcon = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         className: '',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
     });
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -135,6 +158,9 @@ export const createEmergencyPhoneIcon = () => {
     });
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

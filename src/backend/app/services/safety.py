@@ -41,12 +41,15 @@ def apply_infrastructure_adjustments(
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     phone_adjustment = min(emergency_phones * -5, -15)
     lighting_adjustment = {"good": 0, "moderate": 5, "poor": 10}[lighting_quality]
     patrol_adjustment = {"high": -10, "moderate": 0, "low": 5}[patrol_frequency]
     adjusted = score + phone_adjustment + lighting_adjustment + patrol_adjustment
     return max(0.0, min(100.0, adjusted))
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -77,6 +80,9 @@ def infrastructure_adjustment_components(
     }
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

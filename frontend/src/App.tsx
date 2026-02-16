@@ -15,6 +15,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+import { sendDispatchMessage, fetchRoutes } from './services/api';
+>>>>>>> Stashed changes
 =======
 import { sendDispatchMessage, fetchRoutes } from './services/api';
 >>>>>>> Stashed changes
@@ -32,11 +36,14 @@ const App: React.FC = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     routes, selectedRouteId, setSelectedRouteId,
     isDarkMode, toggleDarkMode,
     incidents,
     emergencyPhones: phones
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -50,6 +57,9 @@ const App: React.FC = () => {
     userLocation
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -67,7 +77,12 @@ const App: React.FC = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   const handleSendMessage = (text: string) => {
+=======
+  const handleSendMessage = async (text: string) => {
+    // Add user message
+>>>>>>> Stashed changes
 =======
   const handleSendMessage = async (text: string) => {
     // Add user message
@@ -90,6 +105,7 @@ const App: React.FC = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     // Simulate AI response
     setIsTyping(true);
     setTimeout(() => {
@@ -102,6 +118,8 @@ const App: React.FC = () => {
       });
     }, 3000);
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -179,6 +197,9 @@ const App: React.FC = () => {
     }
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

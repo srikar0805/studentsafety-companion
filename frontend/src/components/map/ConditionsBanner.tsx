@@ -14,6 +14,7 @@ export const ConditionsBanner: React.FC = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     const isNight = hour >= 22 || hour < 6;
 
     return (
@@ -21,6 +22,8 @@ export const ConditionsBanner: React.FC = () => {
             position: 'absolute',
             top: '24px',
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -33,6 +36,9 @@ export const ConditionsBanner: React.FC = () => {
             top: '20px',
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -44,6 +50,7 @@ export const ConditionsBanner: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -60,6 +67,8 @@ export const ConditionsBanner: React.FC = () => {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
             padding: '12px 24px',
             borderRadius: '24px',
             backgroundColor: isNight ? 'rgba(88, 28, 135, 0.95)' : 'rgba(37, 99, 235, 0.95)',
@@ -71,6 +80,9 @@ export const ConditionsBanner: React.FC = () => {
             fontFamily: "'Outfit', sans-serif"
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -80,6 +92,7 @@ export const ConditionsBanner: React.FC = () => {
             {isNight ? <Moon size={20} fill="currentColor" /> : <Sun size={20} fill="currentColor" />}
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -93,6 +106,8 @@ export const ConditionsBanner: React.FC = () => {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
                 <span style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                     {isNight ? 'NIGHTTIME CONDITIONS' : 'DAYTIME CONDITIONS'} ({format(time, 'h:mm a')})
                 </span>
@@ -100,6 +115,9 @@ export const ConditionsBanner: React.FC = () => {
                     {isNight ? 'Higher risk - safety prioritized' : 'Risk levels are lower during daylight'}
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -117,6 +135,7 @@ export const ConditionsBanner: React.FC = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                     padding: '2px 10px',
                     borderRadius: 'var(--radius-full)',
                     backgroundColor: 'var(--color-safety-80)',
@@ -124,6 +143,8 @@ export const ConditionsBanner: React.FC = () => {
                     fontSize: '10px',
                     fontWeight: 700
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -137,6 +158,9 @@ export const ConditionsBanner: React.FC = () => {
                     letterSpacing: '0.02em'
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

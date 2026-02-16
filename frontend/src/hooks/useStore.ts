@@ -19,6 +19,10 @@ interface AppState {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    setRoutes: (routes: RankedRoute[]) => void;
+>>>>>>> Stashed changes
 =======
     setRoutes: (routes: RankedRoute[]) => void;
 >>>>>>> Stashed changes
@@ -35,6 +39,11 @@ interface AppState {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    setIncidents: (incidents: Incident[]) => void;
+    setEmergencyPhones: (phones: EmergencyPhone[]) => void;
+>>>>>>> Stashed changes
 =======
     setIncidents: (incidents: Incident[]) => void;
     setEmergencyPhones: (phones: EmergencyPhone[]) => void;
@@ -56,7 +65,10 @@ interface AppState {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -72,6 +84,9 @@ interface AppState {
     toggleLayer: (layer: "routes" | "incidents" | "phones" | "patrolZones") => void;
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -98,10 +113,13 @@ export const useStore = create<AppState>((set) => ({
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
     incidents: MOCK_INCIDENTS,
     emergencyPhones: MOCK_PHONES,
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -114,6 +132,9 @@ export const useStore = create<AppState>((set) => ({
     setEmergencyPhones: (phones) => set({ emergencyPhones: phones }),
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -127,7 +148,10 @@ export const useStore = create<AppState>((set) => ({
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -147,6 +171,9 @@ export const useStore = create<AppState>((set) => ({
     })),
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
