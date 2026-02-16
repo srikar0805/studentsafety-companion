@@ -1,6 +1,17 @@
 -- Enable PostGIS extension for spatial data
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+-- Drop existing tables to ensure schema updates are applied
+DROP TABLE IF EXISTS safety_assets CASCADE;
+DROP TABLE IF EXISTS campus_buildings CASCADE;
+DROP TABLE IF EXISTS campus_boundary CASCADE;
+DROP TABLE IF EXISTS shuttle_stops CASCADE;
+DROP TABLE IF EXISTS shuttle_routes CASCADE;
+DROP TABLE IF EXISTS traffic_stops CASCADE;
+DROP TABLE IF EXISTS cpd_incidents CASCADE;
+DROP TABLE IF EXISTS police_calls CASCADE;
+DROP TABLE IF EXISTS crime_incidents CASCADE;
+
 -- 1. Crime Incidents Table (from Daily Crime Log / dclog.php)
 -- Stores processed crime reports with categories and dispositions.
 CREATE TABLE IF NOT EXISTS crime_incidents (
@@ -104,7 +115,7 @@ CREATE INDEX IF NOT EXISTS idx_shuttle_stop_loc ON shuttle_stops USING GIST(loca
 CREATE TABLE IF NOT EXISTS campus_boundary (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100),
-    geometry GEOGRAPHY(POLYGON, 4326),
+    geometry GEOGRAPHY(MULTIPOLYGON, 4326),
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -114,7 +125,7 @@ CREATE TABLE IF NOT EXISTS campus_buildings (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100),
     building_number VARCHAR(50),
-    geometry GEOGRAPHY(POLYGON, 4326), 
+    geometry GEOGRAPHY(MULTIPOLYGON, 4326), 
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -135,3 +146,19 @@ CREATE TABLE IF NOT EXISTS safety_assets (
 
 CREATE INDEX IF NOT EXISTS idx_safety_assets ON safety_assets USING GIST(location_geo);
 CREATE INDEX IF NOT EXISTS idx_safety_type ON safety_assets(asset_type);
+
+
+-- 10. Knowledge Base (RAG)
+-- Stores chunks of text from PDF reports with vector embeddings.
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE TABLE IF NOT EXISTS knowledge_base (
+    id SERIAL PRIMARY KEY,
+    content TEXT,
+    embedding vector(384), -- 384 dim for all-MiniLM-L6-v2
+    source VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- HNSW Index for fast similarity search
+CREATE INDEX IF NOT EXISTS idx_rag_embedding ON knowledge_base USING hnsw (embedding vector_l2_ops);

@@ -1,13 +1,20 @@
 # System Files
 .DS_Store
 
+# Environment Variables
+# .env
+
 # Python
 __pycache__/
 *.pyc
+*.pyo
+venv/
+# .venv/
+# env/
 
-# Local Data
-# Ignore massive OSM files (>100MB) preventing git push
+# Data (Check in structure, but ignore large files)
 data/osm/*.osm.pbf
-
-# Allow other data (CSVs, GeoJSONs, PDFs)
-!data/
+# Graph cache
+cache/
+# *.graphml
+*.pkl

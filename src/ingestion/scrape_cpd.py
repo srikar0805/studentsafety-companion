@@ -32,7 +32,8 @@ def scrape_cpd_data():
         'f': 'json',       # Format as JSON
         'resultOffset': 0, # For pagination
         'resultRecordCount': 1000, # Request 1000 at a time
-        'orderByFields': 'reportdate DESC'
+        'orderByFields': 'reportdate DESC',
+        'outSR': '4326'    # Request WGS84 Lat/Lon
     }
     
     all_features = []
@@ -75,9 +76,11 @@ def scrape_cpd_data():
         parsed_data = []
         for feat in all_features:
             attrs = feat.get('attributes', {})
-            # ArcGIS geometry is usually x/y (Web Mercator) or lat/lon depending on coord system
-            # Here we just grab attributes first. If geometry is needed, we'd process 'geometry' key.
-            # Usually the attributes contain enough info or we request geojson.
+            
+            # Extract Geometry (spatial coordinates)
+            geom = feat.get('geometry', {})
+            x = geom.get('x')
+            y = geom.get('y')
             
             # Convert timestamp (epoch ms) to readable date
             report_ts = attrs.get('reportdate')
@@ -92,9 +95,8 @@ def scrape_cpd_data():
                 'full_address': attrs.get('fulladdr'),
                 'city': attrs.get('city'),
                 'zip': attrs.get('zip'),
-                # Lat/Lon might be in attributes or geometry. 
-                # Inspecting one record shows: attributes usually just has data. 
-                # Geometry object is separate. For CSV, we'll stick to attributes explicitly requested.
+                'x': x,
+                'y': y
             })
 
         df = pd.DataFrame(parsed_data)
