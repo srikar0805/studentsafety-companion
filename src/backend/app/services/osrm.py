@@ -11,12 +11,23 @@ class OsrmError(RuntimeError):
     pass
 
 
+def generate_routes(
+    origin: Coordinates,
+    destination: Coordinates,
+    alternatives: int | None = None,
+) -> list[Route]:
     base = settings.osrm_base_url.rstrip("/")
     url = (
         f"{base}/route/v1/foot/"
         f"{origin.longitude},{origin.latitude};"
         f"{destination.longitude},{destination.latitude}"
     )
+    max_alts = settings.max_route_alternatives
+    if alternatives is not None:
+        max_alts = max(0, min(int(alternatives), settings.max_route_alternatives))
+
+    params = {
+        "alternatives": max_alts,
         "steps": "true",
         "geometries": "geojson",
     }

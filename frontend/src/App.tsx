@@ -18,6 +18,13 @@ const App: React.FC = () => {
   const { isMobile, isDesktop } = useResponsive();
   const {
     messages, addMessage, isTyping, setIsTyping,
+    routes, selectedRouteId, setSelectedRouteId, setRoutes,
+    isDarkMode, toggleDarkMode,
+    incidents,
+    emergencyPhones: phones,
+    setIncidents,
+    setEmergencyPhones,
+    userLocation
   } = useStore();
 
   const [activeTab, setActiveTab] = React.useState<'home' | 'chat' | 'map' | 'history' | 'profile'>('chat');
@@ -36,6 +43,77 @@ const App: React.FC = () => {
       timestamp: new Date()
     });
 
+    // Show loading state
+    setIsTyping(true);
+
+    try {
+      const origin = userLocation ?? { latitude: 38.9446, longitude: -92.3266 };
+
+      const [dispatchResult, routesResult] = await Promise.allSettled([
+        sendDispatchMessage(text),
+        fetchRoutes({
+          origin,
+          destination: text,
+          user_mode: 'student',
+          priority: 'safety',
+          time: 'current',
+          concerns: []
+        })
+      ]);
+
+      if (routesResult.status === 'fulfilled') {
+        const payload = routesResult.value;
+        const rankedRoutes = payload.recommendation.routes;
+
+        setRoutes(rankedRoutes);
+        setSelectedRouteId(rankedRoutes.length ? rankedRoutes[0].route.id : null);
+        setIncidents(payload.incidents);
+        setEmergencyPhones(
+          payload.emergency_phones.map((phone: any, index: number) => ({
+            id: `phone-${index + 1}`,
+            location: phone,
+            name: 'Emergency Phone'
+          }))
+        );
+      }
+
+      setIsTyping(false);
+
+      if (dispatchResult.status === 'fulfilled') {
+        addMessage({
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: dispatchResult.value.response,
+          timestamp: new Date()
+        });
+      } else if (routesResult.status === 'fulfilled') {
+        addMessage({
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: routesResult.value.recommendation.explanation,
+          timestamp: new Date()
+        });
+      } else {
+        const error = dispatchResult.status === 'rejected' ? dispatchResult.reason : routesResult.reason;
+        addMessage({
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+          timestamp: new Date()
+        });
+      }
+    } catch (error) {
+      setIsTyping(false);
+
+      addMessage({
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+        timestamp: new Date()
+      });
+
+      console.error('Dispatch API error:', error);
+    }
   };
 
   return (

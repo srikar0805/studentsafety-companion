@@ -23,6 +23,9 @@ from .services.ranking import build_ranked_routes, rank_routes
 from .services.safety import analyze_route_safety, patrol_frequency_label
 from .utils import parse_request_time
 
+logger = logging.getLogger("campus_dispatch")
+logging.basicConfig(level=logging.INFO)
+
 app = FastAPI(title="Campus Dispatch Copilot API")
 cache = get_cache()
 
