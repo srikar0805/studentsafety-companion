@@ -53,13 +53,13 @@ export const useStore = create<AppState>((set) => ({
     isTyping: false,
     setIsTyping: (isTyping) => set({ isTyping }),
 
-    routes: MOCK_ROUTES,
-    selectedRouteId: 'route_1',
+    routes: [],
+    selectedRouteId: null,
     setSelectedRouteId: (id) => set({ selectedRouteId: id }),
     setRoutes: (routes) => set({ routes }),
 
-    incidents: MOCK_INCIDENTS,
-    emergencyPhones: MOCK_PHONES,
+    incidents: [],
+    emergencyPhones: [],
     setIncidents: (incidents) => set({ incidents }),
     setEmergencyPhones: (phones) => set({ emergencyPhones: phones }),
 

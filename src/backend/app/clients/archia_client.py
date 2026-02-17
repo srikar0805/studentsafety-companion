@@ -7,22 +7,25 @@ from ..config import settings
 
 logger = logging.getLogger("campus_dispatch")
 
+ARCHIA_RESPONSES_URL = "https://registry.archia.app/v1/responses"
+
 
 def call_archia(message: str, agent_name: str | None = None) -> dict:
     """
-    Call the Archia Responses API with the given message.
-    
+    Call an Archia agent via the /v1/responses endpoint.
+
+    Uses model: "agent:<name>" routing as documented in the Archia API guide.
+
     Args:
         message: User's natural language query
         agent_name: Name of the agent to invoke (default: from settings)
-    
+
     Returns:
-        Parsed response from the agent
+        dict with "output" key containing the agent's text response
     """
     if not settings.archia_api_key:
         raise RuntimeError("ARCHIA_API_KEY is not configured")
 
-    # Use agent name from settings if not provided
     if agent_name is None:
         agent_name = settings.archia_agent_name
 
@@ -30,44 +33,48 @@ def call_archia(message: str, agent_name: str | None = None) -> dict:
         "Authorization": f"Bearer {settings.archia_api_key}",
         "Content-Type": "application/json",
     }
-    
-    # Archia Cloud uses "model": "agent:<name>" format
+
     payload = {
         "model": f"agent:{agent_name}",
         "input": message,
-        "stream": False
+        "stream": False,
     }
-    
-    logger.info(f"Calling Archia agent '{agent_name}' at {settings.archia_url}")
+
+    logger.info(f"Calling Archia agent '{agent_name}' at {ARCHIA_RESPONSES_URL}")
     logger.debug(f"Payload: {payload}")
-    logger.debug(f"Headers: {dict(headers)}")
-    
+
     response = requests.post(
-        settings.archia_url,
+        ARCHIA_RESPONSES_URL,
         json=payload,
         headers=headers,
         timeout=settings.archia_timeout_seconds,
     )
-    
+
     logger.debug(f"Response Status: {response.status_code}")
-    logger.debug(f"Response Headers: {dict(response.headers)}")
     logger.debug(f"Response Body: {response.text[:500]}")
-    
+
     response.raise_for_status()
-    
+
     result = response.json()
-    
-    # Extract the assistant's response from Archia's output format
-    if "output" in result and len(result["output"]) > 0:
-        for item in result["output"]:
-            if item.get("type") == "message" and item.get("role") == "assistant":
-                content = item.get("content", [])
-                if content and len(content) > 0:
-                    # Return the first text content
-                    for part in content:
-                        if part.get("type") == "output_text":
-                            return {"response": part.get("text", "")}
-    
-    # Fallback: return the raw result
+
+    # Extract text from the Archia Responses API format
+    output_text = _extract_output_text(result)
+    if output_text is not None:
+        return {"output": output_text}
+
+    # Fallback: return raw output array
+    if "output" in result:
+        return {"output": result["output"]}
+
     logger.warning("Unexpected Archia response format, returning raw result")
     return result
+
+
+def _extract_output_text(response_json: dict) -> str | None:
+    """Extract the assistant's text from a /v1/responses reply."""
+    for item in response_json.get("output", []):
+        if item.get("type") == "message":
+            for content in item.get("content", []):
+                if content.get("type") == "output_text":
+                    return content.get("text")
+    return None

@@ -2,23 +2,36 @@ import React, { useState } from 'react';
 import { useMap } from 'react-leaflet';
 import { Plus, Minus, Crosshair, Maximize, Minimize, Layers, Check } from 'lucide-react';
 import { useStore } from '../../hooks/useStore';
+import L from 'leaflet';
+
+const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+};
+
+const preventMapInteraction = {
+    onClick: stopPropagation,
+    onMouseDown: stopPropagation,
+    onDoubleClick: stopPropagation,
+    onScroll: (e: any) => e.stopPropagation(),
+};
 
 export const ZoomControl: React.FC = () => {
     const map = useMap();
 
     return (
-        <div className="leaflet-top leaflet-right">
-            <div className="leaflet-control map-custom-control">
+        <div className="leaflet-top leaflet-right" style={{ marginTop: '120px' }}>
+            <div className="leaflet-control map-custom-control" {...preventMapInteraction}>
                 <button
                     className="map-control-btn touch-optimized"
-                    onClick={() => map.zoomIn()}
+                    onClick={(e) => { stopPropagation(e); map.zoomIn(); }}
                     title="Zoom In"
                 >
                     <Plus size={20} />
                 </button>
                 <button
                     className="map-control-btn touch-optimized"
-                    onClick={() => map.zoomOut()}
+                    onClick={(e) => { stopPropagation(e); map.zoomOut(); }}
                     title="Zoom Out"
                 >
                     <Minus size={20} />
@@ -28,17 +41,51 @@ export const ZoomControl: React.FC = () => {
     );
 };
 
+import { useResponsive } from '../../hooks/useResponsive';
+
 export const LocateControl: React.FC = () => {
     const map = useMap();
+    const setUserLocation = useStore((state) => state.setUserLocation);
+    const { isDesktop } = useResponsive();
 
-    const handleLocate = () => {
-        map.setZoom(17);
-        map.locate({ setView: true, maxZoom: 18 });
+    React.useEffect(() => {
+        // Handler for geolocation found
+        const onLocationFound = (e: any) => {
+            if (e && e.latlng) {
+                setUserLocation({ latitude: e.latlng.lat, longitude: e.latlng.lng });
+
+                // Apply offset if on desktop to avoid being covered by chat
+                let targetLng = e.latlng.lng;
+                if (isDesktop) {
+                    // Shift center by half of chat width + margin (420px + 24px) / 2 = 222px
+                    // This puts the pin perfectly in the center of the remaining space to the right
+                    const point = map.project(e.latlng, 18);
+                    const newPoint = point.subtract([222, 0]);
+                    const newCenter = map.unproject(newPoint, 18);
+                    map.setView(newCenter, 18);
+                } else {
+                    map.setView(e.latlng, 18);
+                }
+            }
+        };
+        map.on('locationfound', onLocationFound);
+
+        // Trigger initial location without auto-setView, let the handler do it
+        map.locate({ setView: false, maxZoom: 18 });
+
+        return () => {
+            map.off('locationfound', onLocationFound);
+        };
+    }, [map, setUserLocation, isDesktop]);
+
+    const handleLocate = (e: React.MouseEvent) => {
+        stopPropagation(e);
+        map.locate({ setView: false, maxZoom: 18 });
     };
 
     return (
-        <div className="leaflet-top leaflet-right" style={{ marginTop: '106px' }}>
-            <div className="leaflet-control map-custom-control">
+        <div className="leaflet-top leaflet-right" style={{ marginTop: '230px' }}>
+            <div className="leaflet-control map-custom-control" {...preventMapInteraction}>
                 <button
                     className="map-control-btn touch-optimized"
                     onClick={handleLocate}
@@ -63,11 +110,11 @@ export const LayerControl: React.FC = () => {
     ] as const;
 
     return (
-        <div className="leaflet-top leaflet-right" style={{ marginTop: '162px' }}>
-            <div className="leaflet-control map-custom-control" style={{ position: 'relative' }}>
+        <div className="leaflet-top leaflet-right" style={{ marginTop: '300px' }}>
+            <div className="leaflet-control map-custom-control" style={{ position: 'relative' }} {...preventMapInteraction}>
                 <button
                     className="map-control-btn touch-optimized"
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={(e) => { stopPropagation(e); setIsOpen(!isOpen); }}
                     title="Layer Controls"
                 >
                     <Layers size={20} />
@@ -95,7 +142,7 @@ export const LayerControl: React.FC = () => {
                         {layers.map((layer) => (
                             <button
                                 key={layer.id}
-                                onClick={() => toggleLayer(layer.id)}
+                                onClick={(e) => { stopPropagation(e); toggleLayer(layer.id); }}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -130,7 +177,8 @@ export const LayerControl: React.FC = () => {
 export const FullscreenControl: React.FC = () => {
     const [isFullscreen, setIsFullscreen] = React.useState(false);
 
-    const toggleFullscreen = () => {
+    const toggleFullscreen = (e: React.MouseEvent) => {
+        stopPropagation(e);
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
             setIsFullscreen(true);
@@ -143,8 +191,8 @@ export const FullscreenControl: React.FC = () => {
     };
 
     return (
-        <div className="leaflet-top leaflet-right" style={{ marginTop: '218px' }}>
-            <div className="leaflet-control map-custom-control">
+        <div className="leaflet-top leaflet-right" style={{ marginTop: '370px' }}>
+            <div className="leaflet-control map-custom-control" {...preventMapInteraction}>
                 <button
                     className="map-control-btn touch-optimized"
                     onClick={toggleFullscreen}
@@ -156,3 +204,4 @@ export const FullscreenControl: React.FC = () => {
         </div>
     );
 };
+

@@ -14,7 +14,11 @@ def calculate_base_score(incidents: list[Incident]) -> float:
 def apply_temporal_weight(incidents: list[Incident], current_time: datetime) -> float:
     weighted_score = 0.0
     for incident in incidents:
-        days_ago = (current_time - incident.date).days
+        inc_date = incident.date
+        ct = current_time.replace(tzinfo=None) if current_time.tzinfo else current_time
+        if inc_date.tzinfo is not None:
+            inc_date = inc_date.replace(tzinfo=None)
+        days_ago = (ct - inc_date).days
         if days_ago <= 30:
             weight = 5.0
         elif days_ago <= 90:

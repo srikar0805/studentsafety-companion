@@ -1,18 +1,19 @@
 import React from 'react';
-import { Home, MessageSquare, Map as MapIcon, Clock, User } from 'lucide-react';
+import { Home, MessageSquare, Map as MapIcon, User, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface BottomNavProps {
     activeTab: 'home' | 'chat' | 'map' | 'history' | 'profile';
     setActiveTab: (tab: any) => void;
+    onSOS: () => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, onSOS }) => {
     const navItems = [
         { id: 'home', icon: Home, label: 'Home' },
         { id: 'chat', icon: MessageSquare, label: 'Chat' },
+        { id: 'sos', icon: AlertTriangle, label: 'SOS', isAction: true },
         { id: 'map', icon: MapIcon, label: 'Map' },
-        { id: 'history', icon: Clock, label: 'History' },
         { id: 'profile', icon: User, label: 'Profile' },
     ];
 
@@ -34,12 +35,20 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
             zIndex: 1000,
             boxShadow: '0 -4px 16px rgba(0,0,0,0.05)'
         }}>
-            {navItems.map(({ id, icon: Icon, label }) => {
+            {navItems.map(({ id, icon: Icon, label, isAction }) => {
                 const isActive = activeTab === id;
+                const isSOS = id === 'sos';
+
                 return (
                     <button
                         key={id}
-                        onClick={() => setActiveTab(id)}
+                        onClick={() => {
+                            if (isAction && onSOS) {
+                                onSOS();
+                            } else {
+                                setActiveTab(id);
+                            }
+                        }}
                         aria-label={label}
                         aria-current={isActive ? 'page' : undefined}
                         style={{
@@ -47,14 +56,17 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
                             flexDirection: 'column',
                             alignItems: 'center',
                             gap: '4px',
-                            color: isActive ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                            transition: 'color 0.3s var(--ease-out)',
+                            color: isSOS ? 'var(--color-safety-100)' : (isActive ? 'var(--color-primary)' : 'var(--color-text-muted)'),
+                            transition: 'all 0.3s var(--ease-out)',
                             position: 'relative',
                             padding: '8px 12px',
                             borderRadius: 'var(--radius-md)',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer'
                         }}
                     >
-                        {isActive && (
+                        {isActive && !isSOS && (
                             <motion.div
                                 layoutId="nav-indicator"
                                 style={{
@@ -70,10 +82,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
                                 transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                             />
                         )}
-                        <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                        <Icon size={24} strokeWidth={isActive || isSOS ? 2.5 : 2} fill={isSOS ? "currentColor" : "none"} />
                         <span style={{
                             fontSize: '10px',
-                            fontWeight: isActive ? 800 : 500,
+                            fontWeight: isActive || isSOS ? 800 : 500,
                             letterSpacing: '0.02em',
                             textTransform: 'uppercase'
                         }}>

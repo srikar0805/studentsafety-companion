@@ -1,11 +1,12 @@
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables from .env file at workspace root
 env_path = Path(__file__).parent.parent.parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -22,13 +23,23 @@ class Settings:
         "GEOCODER_USER_AGENT", "campus-dispatch-copilot/1.0"
     )
     archia_api_key: str | None = os.getenv("ARCHIA_API_KEY")
-    archia_url: str = os.getenv(
-        "ARCHIA_URL",
-        "https://registry.archia.app/v1/responses",
+    archia_base_url: str = os.getenv(
+        "ARCHIA_BASE_URL",
+        "https://registry.archia.app",
     )
     archia_agent_name: str = os.getenv(
         "ARCHIA_AGENT_NAME",
-        "campus_dispatch_orchestrator",
+        "Campus Dispatch Orchestrator",
+    )
+    # Agent names for multi-agent support
+    routing_agent_name: str = os.getenv(
+        "ROUTING_AGENT_NAME", "Campus Routing Engine"
+    )
+    risk_agent_name: str = os.getenv(
+        "RISK_AGENT_NAME", "Campus risk and prediction engine"
+    )
+    context_agent_name: str = os.getenv(
+        "CONTEXT_AGENT_NAME", "campus context and journalism agent"
     )
     tool_api_key: str | None = os.getenv("TOOL_API_KEY")
     archia_timeout_seconds: int = int(os.getenv("ARCHIA_TIMEOUT_SECONDS", "30"))

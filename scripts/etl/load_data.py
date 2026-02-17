@@ -80,35 +80,37 @@ def load_cpd_crime_data(engine):
     # Clean
     df['report_date'] = pd.to_datetime(df['report_date'])
     
-    print(f"CPD: Found {len(df)} rows.")
-    with engine.connect() as conn:
-        count = 0
-        for _, row in df.iterrows():
-            try:
-                # Create Point Geometry
-                if pd.notnull(row['x']) and pd.notnull(row['y']):
-                    count += 1
-                    # ArcGIS usually x=lon, y=lat
-                    wkt = f"POINT({row['x']} {row['y']})" 
-                    
+    print(f"CPD: Found {len(df)} rows. Preparing chunks...")
+    data_to_insert = []
+    for _, row in df.iterrows():
+        if pd.notnull(row['x']) and pd.notnull(row['y']):
+            wkt = f"POINT({row['x']} {row['y']})"
+            data_to_insert.append({
+                "oid": str(row['offense_id']),
+                "rdate": row['report_date'],
+                "desc": row['nibrs_description'],
+                "addr": row['full_address'],
+                "wkt": wkt
+            })
+
+    if data_to_insert:
+        CHUNK_SIZE = 1000
+        with engine.connect() as conn:
+            for i in range(0, len(data_to_insert), CHUNK_SIZE):
+                chunk = data_to_insert[i:i + CHUNK_SIZE]
+                try:
+                    print(f"Executing batch insert of {len(chunk)} records (Total: {i + len(chunk)}/{len(data_to_insert)})...")
                     sql = text("""
                         INSERT INTO cpd_incidents (offense_id, report_date, nibrs_description, full_address, location_geo)
                         VALUES (:oid, :rdate, :desc, :addr, ST_SetSRID(ST_GeomFromText(:wkt), 4326))
                         ON CONFLICT (offense_id) DO NOTHING;
                     """)
-                    
-                    conn.execute(sql, {
-                        "oid": str(row['offense_id']),
-                        "rdate": row['report_date'],
-                        "desc": row['nibrs_description'],
-                        "addr": row['full_address'],
-                        "wkt": wkt
-                    })
+                    conn.execute(sql, chunk)
                     conn.commit()
-            except Exception as e:
-                print(f"Error cpd row: {e}") 
-                pass
-    print("CPD Crime Data Loaded.")
+                except Exception as e:
+                    print(f"Error in batch load chunk starting at {i}: {e}")
+                    conn.rollback()
+        print("CPD Crime Data Loaded.")
 
 def load_shuttle_routes(engine):
     print("\n--- Loading Shuttle Routes ---")

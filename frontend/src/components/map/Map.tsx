@@ -21,7 +21,7 @@ interface MapProps {
 }
 
 export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRouteId, incidents: rawIncidents, phones: rawPhones }) => {
-    const { userLocation, layerVisibility } = useStore();
+    const { userLocation, layerVisibility, isDarkMode } = useStore();
     const [animatedPath, setAnimatedPath] = React.useState<[number, number][]>([]);
 
     useEffect(() => {
@@ -54,7 +54,7 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
         ? [userLocation.latitude, userLocation.longitude]
         : [38.9404, -92.3277];
 
-    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+
 
     // Simple Clustering logic for incidents
     const clusterMarkers = (items: Incident[]) => {
