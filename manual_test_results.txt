@@ -1,7 +1,6 @@
 
-==================================================
+
 STARTING COMPREHENSIVE AGENT TEST
-==================================================
 
 TEST CASE 1: Safest route from Rollins Hall to Ellis Library at 11pm
 
@@ -13,7 +12,6 @@ ETA: 10.0 mins
 Risk Score: 90.0%
 Summary: Recent reports: Ellis Library has high security presence during finals week.
 
-==================================================
 COMPREHENSIVE TEST COMPLETE
-==================================================
+
 

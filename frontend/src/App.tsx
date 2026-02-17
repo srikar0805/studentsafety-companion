@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useResponsive } from './hooks/useResponsive';
 import { Header } from './components/layout/Header';
@@ -12,42 +13,12 @@ import { RouteCardSkeleton } from './components/shared/Skeleton';
 import { useStore } from './hooks/useStore';
 import { MessageSquare, Map as MapIcon, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
 import { sendDispatchMessage, fetchRoutes } from './services/api';
->>>>>>> Stashed changes
-=======
-import { sendDispatchMessage, fetchRoutes } from './services/api';
->>>>>>> Stashed changes
-=======
-import { sendDispatchMessage, fetchRoutes } from './services/api';
->>>>>>> Stashed changes
-=======
-import { sendDispatchMessage, fetchRoutes } from './services/api';
->>>>>>> Stashed changes
 
 const App: React.FC = () => {
   const { isMobile, isDesktop } = useResponsive();
   const {
     messages, addMessage, isTyping, setIsTyping,
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    routes, selectedRouteId, setSelectedRouteId,
-    isDarkMode, toggleDarkMode,
-    incidents,
-    emergencyPhones: phones
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     routes, selectedRouteId, setSelectedRouteId, setRoutes,
     isDarkMode, toggleDarkMode,
     incidents,
@@ -55,16 +26,7 @@ const App: React.FC = () => {
     setIncidents,
     setEmergencyPhones,
     userLocation
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+  } = useStore();
   } = useStore();
 
   const [activeTab, setActiveTab] = React.useState<'home' | 'chat' | 'map' | 'history' | 'profile'>('chat');
@@ -74,27 +36,8 @@ const App: React.FC = () => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  const handleSendMessage = (text: string) => {
-=======
   const handleSendMessage = async (text: string) => {
     // Add user message
->>>>>>> Stashed changes
-=======
-  const handleSendMessage = async (text: string) => {
-    // Add user message
->>>>>>> Stashed changes
-=======
-  const handleSendMessage = async (text: string) => {
-    // Add user message
->>>>>>> Stashed changes
-=======
-  const handleSendMessage = async (text: string) => {
-    // Add user message
->>>>>>> Stashed changes
     addMessage({
       id: Date.now().toString(),
       role: 'user',
@@ -102,28 +45,6 @@ const App: React.FC = () => {
       timestamp: new Date()
     });
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    // Simulate AI response
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      addMessage({
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `I've analyzed the paths to your destination. Based on current nighttime conditions, I've found ${routes.length} possible routes.`,
-        timestamp: new Date()
-      });
-    }, 3000);
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     // Show loading state
     setIsTyping(true);
 
@@ -195,16 +116,78 @@ const App: React.FC = () => {
 
       console.error('Dispatch API error:', error);
     }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+    // Show loading state
+    setIsTyping(true);
+
+    try {
+      const origin = userLocation ?? { latitude: 38.9446, longitude: -92.3266 };
+
+      const [dispatchResult, routesResult] = await Promise.allSettled([
+        sendDispatchMessage(text),
+        fetchRoutes({
+          origin,
+          destination: text,
+          user_mode: 'student',
+          priority: 'safety',
+          time: 'current',
+          concerns: []
+        })
+      ]);
+
+      if (routesResult.status === 'fulfilled') {
+        const payload = routesResult.value;
+        const rankedRoutes = payload.recommendation.routes;
+
+        setRoutes(rankedRoutes);
+        setSelectedRouteId(rankedRoutes.length ? rankedRoutes[0].route.id : null);
+        setIncidents(payload.incidents);
+        setEmergencyPhones(
+          payload.emergency_phones.map((phone, index) => ({
+            id: `phone-${index + 1}`,
+            location: phone,
+            name: 'Emergency Phone'
+          }))
+        );
+      }
+
+      setIsTyping(false);
+
+      if (dispatchResult.status === 'fulfilled') {
+        addMessage({
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: dispatchResult.value.response,
+          timestamp: new Date()
+        });
+      } else if (routesResult.status === 'fulfilled') {
+        addMessage({
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: routesResult.value.recommendation.explanation,
+          timestamp: new Date()
+        });
+      } else {
+        const error = dispatchResult.status === 'rejected' ? dispatchResult.reason : routesResult.reason;
+        addMessage({
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+          timestamp: new Date()
+        });
+      }
+    } catch (error) {
+      setIsTyping(false);
+
+      addMessage({
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+        timestamp: new Date()
+      });
+
+      console.error('Dispatch API error:', error);
+    }
+// ...existing code...
   };
 
   return (
@@ -426,60 +409,74 @@ const App: React.FC = () => {
                 ) : (
                   <motion.div
                     key="map"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    style={{ height: '100%', paddingBottom: isMobile ? 'var(--bottom-nav-height)' : 0 }}
-                  >
-                    <Map
-                      routes={routes}
-                      selectedRouteId={selectedRouteId}
-                      setSelectedRouteId={setSelectedRouteId}
-                      incidents={incidents}
-                      phones={phones}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        )}
+                        // Show loading state
+                        setIsTyping(true);
 
-        {/* Floating SOS Button */}
-        <motion.button
-          onClick={() => {
-            if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
-            alert('SOS activated! Sharing location with campus police and emergency contacts.');
-          }}
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          style={{
-            position: 'absolute',
-            bottom: isMobile ? 'calc(var(--bottom-nav-height) + 24px)' : '32px',
-            right: '32px',
-            width: '64px',
-            height: '64px',
-            borderRadius: 'var(--radius-full)',
-            backgroundColor: 'var(--color-safety-100)',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 32px rgba(211, 47, 47, 0.4)',
-            zIndex: 2000,
-            fontWeight: 800,
-            fontSize: '14px',
-            border: '3px solid white',
-            cursor: 'pointer'
-          }}
-        >
-          SOS
-        </motion.button>
-      </main>
+                        try {
+                          const origin = userLocation ?? { latitude: 38.9446, longitude: -92.3266 };
 
-      {isMobile && <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />}
-    </div>
-  );
-};
+                          const [dispatchResult, routesResult] = await Promise.allSettled([
+                            sendDispatchMessage(text),
+                            fetchRoutes({
+                              origin,
+                              destination: text,
+                              user_mode: 'student',
+                              priority: 'safety',
+                              time: 'current',
+                              concerns: []
+                            })
+                          ]);
 
-export default App;
+                          if (routesResult.status === 'fulfilled') {
+                            const payload = routesResult.value;
+                            const rankedRoutes = payload.recommendation.routes;
+
+                            setRoutes(rankedRoutes);
+                            setSelectedRouteId(rankedRoutes.length ? rankedRoutes[0].route.id : null);
+                            setIncidents(payload.incidents);
+                            setEmergencyPhones(
+                              payload.emergency_phones.map((phone, index) => ({
+                                id: `phone-${index + 1}`,
+                                location: phone,
+                                name: 'Emergency Phone'
+                              }))
+                            );
+                          }
+
+                          setIsTyping(false);
+
+                          if (dispatchResult.status === 'fulfilled') {
+                            addMessage({
+                              id: (Date.now() + 1).toString(),
+                              role: 'assistant',
+                              content: dispatchResult.value.response,
+                              timestamp: new Date()
+                            });
+                          } else if (routesResult.status === 'fulfilled') {
+                            addMessage({
+                              id: (Date.now() + 1).toString(),
+                              role: 'assistant',
+                              content: routesResult.value.recommendation.explanation,
+                              timestamp: new Date()
+                            });
+                          } else {
+                            const error = dispatchResult.status === 'rejected' ? dispatchResult.reason : routesResult.reason;
+                            addMessage({
+                              id: (Date.now() + 1).toString(),
+                              role: 'assistant',
+                              content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+                              timestamp: new Date()
+                            });
+                          }
+                        } catch (error) {
+                          setIsTyping(false);
+
+                          addMessage({
+                            id: (Date.now() + 1).toString(),
+                            role: 'assistant',
+                            content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+                            timestamp: new Date()
+                          });
+
+                          console.error('Dispatch API error:', error);
+                        }

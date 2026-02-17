@@ -2,7 +2,10 @@
 .DS_Store
 
 # Environment Variables
-# .env
+.env
+.env.*
+frontend/.env
+frontend/.env.*
 
 # Python
 __pycache__/
@@ -11,6 +14,59 @@ __pycache__/
 venv/
 # .venv/
 # env/
+
+# Node
+frontend/node_modules/
+node_modules/
+
+# VSCode
+.vscode/
+
+# OS
+Thumbs.db
+
+# Logs
+*.log
+
+# Test and coverage
+.coverage
+coverage/
+htmlcov/
+*.cover
+*.py,cover
+
+# Build
+build/
+dist/
+*.egg-info/
+frontend/dist/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Misc
+*.swp
+*.swo
+
+# Database
+*.sqlite3
+*.db
+
+# Ignore data outputs
+data/**/*.csv
+data/**/*.geojson
+
+# Ignore secrets
+*.key
+*.pem
+
+# Ignore output files
+test_results.txt
+manual_test_results.txt
+
+# Ignore generated files
+*.bak
+*.tmp
 
 # Data (Check in structure, but ignore large files)
 data/osm/*.osm.pbf

@@ -1,33 +1,11 @@
 from dataclasses import dataclass
 import os
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables from .env file at workspace root
 env_path = Path(__file__).parent.parent.parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-
 
 @dataclass(frozen=True)
 class Settings:
@@ -43,17 +21,6 @@ class Settings:
     geocoder_user_agent: str = os.getenv(
         "GEOCODER_USER_AGENT", "campus-dispatch-copilot/1.0"
     )
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     archia_api_key: str | None = os.getenv("ARCHIA_API_KEY")
     archia_url: str = os.getenv(
         "ARCHIA_URL",
@@ -65,21 +32,10 @@ class Settings:
     )
     tool_api_key: str | None = os.getenv("TOOL_API_KEY")
     archia_timeout_seconds: int = int(os.getenv("ARCHIA_TIMEOUT_SECONDS", "30"))
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     spatial_radius_m: int = int(os.getenv("SPATIAL_RADIUS_M", "500"))
     phone_radius_m: int = int(os.getenv("PHONE_RADIUS_M", "100"))
     temporal_window_days: int = int(os.getenv("TEMPORAL_WINDOW_DAYS", "30"))
     traffic_window_days: int = int(os.getenv("TRAFFIC_WINDOW_DAYS", "90"))
     max_route_alternatives: int = int(os.getenv("MAX_ROUTE_ALTERNATIVES", "2"))
-
 
 settings = Settings()
