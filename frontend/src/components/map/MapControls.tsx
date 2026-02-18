@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useMap } from 'react-leaflet';
 import { Plus, Minus, Crosshair, Maximize, Minimize, Layers, Check } from 'lucide-react';
 import { useStore } from '../../hooks/useStore';
-import L from 'leaflet';
 
 const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -55,7 +54,6 @@ export const LocateControl: React.FC = () => {
                 setUserLocation({ latitude: e.latlng.lat, longitude: e.latlng.lng });
 
                 // Apply offset if on desktop to avoid being covered by chat
-                let targetLng = e.latlng.lng;
                 if (isDesktop) {
                     // Shift center by half of chat width + margin (420px + 24px) / 2 = 222px
                     // This puts the pin perfectly in the center of the remaining space to the right

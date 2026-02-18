@@ -5,7 +5,6 @@
 import type { RankedRoute } from '../types/route';
 import type { Incident } from '../types/incident';
 import type { Coordinates } from '../types/coordinates';
-import type { DisambiguationResponse } from '../types/disambiguation';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 

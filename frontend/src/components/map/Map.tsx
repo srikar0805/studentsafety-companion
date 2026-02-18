@@ -107,11 +107,15 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
 
 
     // Simple Clustering logic for incidents
-    const clusterMarkers = (items: Incident[]) => {
-        if (!layerVisibility.incidents) return [];
-        if (items.length <= 12) return items.map(item => ({ type: 'single', data: item }));
+    type ClusterItem = { type: 'cluster'; count: number; data: { latitude: number; longitude: number } };
+    type SingleItem = { type: 'single'; data: Incident };
+    type MapItem = ClusterItem | SingleItem;
 
-        const clusters: { type: 'cluster' | 'single', data: any, count?: number }[] = [];
+    const clusterMarkers = (items: Incident[]): MapItem[] => {
+        if (!layerVisibility.incidents) return [];
+        if (items.length <= 12) return items.map(item => ({ type: 'single', data: item } as SingleItem));
+
+        const clusters: MapItem[] = [];
         const usedIndex = new Set();
 
         for (let i = 0; i < items.length; i++) {
@@ -260,7 +264,7 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
                             <Marker
                                 key={`cluster-${idx}`}
                                 position={[item.data.latitude, item.data.longitude] as [number, number]}
-                                icon={createClusterIcon(item.count!)}
+                                icon={createClusterIcon(item.count)}
                             >
                                 <Popup>
                                     <div style={{ fontSize: '12px' }}>
