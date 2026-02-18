@@ -25,7 +25,7 @@ export const InputArea: React.FC<InputAreaProps> = ({ onSendMessage }) => {
     return (
         <div style={{
             padding: 'var(--spacing-md)',
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            backgroundColor: 'var(--glass-bg)',
             backdropFilter: 'var(--glass-blur)',
             WebkitBackdropFilter: 'var(--glass-blur)',
             borderTop: '1px solid var(--glass-border)',

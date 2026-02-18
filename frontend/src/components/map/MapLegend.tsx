@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Map as MapIcon, AlertCircle, Phone, Shield } from 'lucide-react';
+import { useResponsive } from '../../hooks/useResponsive';
 
 export const MapLegend: React.FC = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const { isDesktop } = useResponsive();
 
     return (
         <div style={{
             position: 'absolute',
             bottom: '20px',
-            left: '20px',
+            left: isDesktop ? '480px' : '20px',
             zIndex: 1000,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
+            backgroundColor: 'var(--glass-bg)',
+            backdropFilter: 'var(--glass-blur)',
             borderRadius: '12px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             width: isCollapsed ? '48px' : '250px',

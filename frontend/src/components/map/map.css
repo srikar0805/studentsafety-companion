@@ -99,6 +99,7 @@
     flex-direction: column;
     overflow: hidden;
     margin: 12px !important;
+    z-index: 2000;
 }
 
 [data-theme="dark"] .map-custom-control {

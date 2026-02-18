@@ -129,7 +129,9 @@
   /* Layout */
   --header-height: 60px;
   --bottom-nav-height: 64px;
-  --chat-width: 400px;
+  --color-chat-bg: rgba(255, 255, 255, 0.90);
+  --color-chat-border: rgba(255, 255, 255, 0.6);
+  --color-bg-card: var(--color-white);
 }
 
 /* Dark Mode Overrides */
@@ -153,6 +155,24 @@
   /* Backward compatibility */
   --color-white: var(--color-bg-primary);
   --color-black: var(--color-text-primary);
+
+  /* Grayscale Overrides for Dark Mode */
+  --color-gray-50: hsl(217, 33%, 20%);
+  --color-gray-100: hsl(217, 33%, 25%);
+  --color-gray-200: hsl(217, 33%, 30%);
+  --color-gray-300: hsl(217, 33%, 40%);
+  --color-gray-400: hsl(215, 20%, 60%);
+  --color-gray-500: var(--color-text-muted);
+  --color-gray-600: hsl(215, 16%, 70%);
+  --color-gray-700: var(--color-text-secondary);
+  --color-gray-800: hsl(210, 40%, 95%);
   --color-gray-900: var(--color-text-primary);
-  --color-gray-800: var(--color-text-secondary);
+
+  --color-bg-card: hsl(217, 33%, 20%);
+
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  --color-chat-bg: rgba(15, 23, 42, 0.85);
+  --color-chat-border: rgba(255, 255, 255, 0.1);
 }

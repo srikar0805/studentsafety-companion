@@ -5,12 +5,12 @@ import { BottomNav } from './components/layout/BottomNav';
 import { MessageBubble } from './components/chat/MessageBubble';
 import { RouteCard } from './components/chat/RouteCard';
 import { InputArea } from './components/chat/InputArea';
-import { RouteComparisonView } from './components/chat/RouteComparisonView';
+import { FloatingChat } from './components/chat/FloatingChat';
 import { Map } from './components/map/Map';
 import { LoadingState } from './components/shared/LoadingState';
-import { RouteCardSkeleton } from './components/shared/Skeleton';
+import { QuickActions } from './components/chat/QuickActions';
 import { useStore } from './hooks/useStore';
-import { MessageSquare, Map as MapIcon, Shield } from 'lucide-react';
+import { MessageSquare, Map as MapIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sendDispatchMessage, fetchRoutes } from './services/api';
 
@@ -46,74 +46,65 @@ const App: React.FC = () => {
     // Show loading state
     setIsTyping(true);
 
+    const origin = userLocation ?? { latitude: 38.9446, longitude: -92.3266 };
+
+    // 1. Fetch routes first (fast ~2s) — show results immediately
     try {
-      const origin = userLocation ?? { latitude: 38.9446, longitude: -92.3266 };
+      const routesPayload = await fetchRoutes({
+        origin,
+        destination: text,
+        user_mode: 'student',
+        priority: 'safety',
+        time: 'current',
+        concerns: []
+      });
 
-      const [dispatchResult, routesResult] = await Promise.allSettled([
-        sendDispatchMessage(text),
-        fetchRoutes({
-          origin,
-          destination: text,
-          user_mode: 'student',
-          priority: 'safety',
-          time: 'current',
-          concerns: []
-        })
-      ]);
+      const rankedRoutes = routesPayload.recommendation.routes;
+      setRoutes(rankedRoutes);
+      setSelectedRouteId(rankedRoutes.length ? rankedRoutes[0].route.id : null);
+      setIncidents(routesPayload.incidents);
+      setEmergencyPhones(
+        routesPayload.emergency_phones.map((phone, index) => ({
+          id: `phone-${index + 1}`,
+          location: phone,
+          name: 'Emergency Phone'
+        }))
+      );
 
-      if (routesResult.status === 'fulfilled') {
-        const payload = routesResult.value;
-        const rankedRoutes = payload.recommendation.routes;
-
-        setRoutes(rankedRoutes);
-        setSelectedRouteId(rankedRoutes.length ? rankedRoutes[0].route.id : null);
-        setIncidents(payload.incidents);
-        setEmergencyPhones(
-          payload.emergency_phones.map((phone: any, index: number) => ({
-            id: `phone-${index + 1}`,
-            location: phone,
-            name: 'Emergency Phone'
-          }))
-        );
-      }
-
+      // Show route explanation immediately
       setIsTyping(false);
-
-      if (dispatchResult.status === 'fulfilled') {
-        addMessage({
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: dispatchResult.value.response,
-          timestamp: new Date()
-        });
-      } else if (routesResult.status === 'fulfilled') {
-        addMessage({
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: routesResult.value.recommendation.explanation,
-          timestamp: new Date()
-        });
-      } else {
-        const error = dispatchResult.status === 'rejected' ? dispatchResult.reason : routesResult.reason;
-        addMessage({
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
-          timestamp: new Date()
-        });
-      }
-    } catch (error) {
-      setIsTyping(false);
-
       addMessage({
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+        content: routesPayload.recommendation.explanation,
         timestamp: new Date()
       });
-
-      console.error('Dispatch API error:', error);
+    } catch (routeError) {
+      console.error('Routes API error:', routeError);
+      setIsTyping(false);
+      addMessage({
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Sorry, I couldn't generate routes: ${routeError instanceof Error ? routeError.message : 'Unknown error'}. Please try again.`,
+        timestamp: new Date()
+      });
     }
+
+    // 2. Fetch AI dispatch response in background (slow ~20s) — append when ready
+    sendDispatchMessage(text)
+      .then((dispatchResult) => {
+        if (dispatchResult.response) {
+          addMessage({
+            id: (Date.now() + 2).toString(),
+            role: 'assistant',
+            content: dispatchResult.response,
+            timestamp: new Date()
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('Dispatch API error:', err);
+      });
   };
 
   return (
@@ -132,89 +123,7 @@ const App: React.FC = () => {
         {isDesktop ? (
           <div style={{ display: 'flex', height: '100%' }}>
             {/* Desktop Left Sidebar: Chat */}
-            <aside style={{
-              width: 'var(--chat-width)',
-              backgroundColor: 'rgba(255, 255, 255, 0.75)',
-              backdropFilter: 'var(--glass-blur)',
-              WebkitBackdropFilter: 'var(--glass-blur)',
-              borderRight: '1px solid var(--glass-border)',
-              display: 'flex',
-              flexDirection: 'column',
-              zIndex: 10,
-              boxShadow: 'var(--glass-shadow)'
-            }}>
-              <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '20px' }} className="chat-container">
-                {messages.map(m => <MessageBubble key={m.id} message={m} />)}
-
-                {isTyping && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-                    <LoadingState />
-                    <div style={{ padding: '0 var(--spacing-md)' }}>
-                      <RouteCardSkeleton />
-                      <RouteCardSkeleton />
-                    </div>
-                  </div>
-                )}
-
-                {!isTyping && messages.length > 1 && (
-                  <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    variants={{
-                      hidden: { opacity: 0 },
-                      visible: {
-                        opacity: 1,
-                        transition: {
-                          staggerChildren: 0.15,
-                          delayChildren: 0.4
-                        }
-                      }
-                    }}
-                  >
-                    <motion.div
-                      variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}
-                      style={{ padding: '0 var(--spacing-md)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}
-                    >
-                      <Shield size={16} color="var(--color-brand-blue)" />
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-brand-blue)' }}>SAFETY RECOMMENDATIONS</span>
-                    </motion.div>
-
-                    {routes.map((r) => (
-                      <motion.div
-                        key={r.route.id}
-                        variants={{
-                          hidden: { opacity: 0, y: 20, scale: 0.95 },
-                          visible: { opacity: 1, y: 0, scale: 1 }
-                        }}
-                        transition={{ type: 'spring', stiffness: 50, damping: 15 }}
-                      >
-                        <RouteCard
-                          rankedRoute={r}
-                          isSelected={selectedRouteId === r.route.id}
-                          onSelect={setSelectedRouteId}
-                        />
-                      </motion.div>
-                    ))}
-
-                    {routes.length >= 2 && (
-                      <motion.div
-                        variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-                        transition={{ delay: 0.8 }}
-                      >
-                        <RouteComparisonView recommended={routes[0]} alternative={routes[1]} />
-                      </motion.div>
-                    )}
-
-                    {routes.length > 0 && (
-                      <div role="status" aria-live="polite" className="sr-only">
-                        Found {routes.length} safe routes to your destination.
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </div>
-              <InputArea onSendMessage={handleSendMessage} />
-            </aside>
+            <FloatingChat onSendMessage={handleSendMessage} />
 
             {/* Desktop Right: Map */}
             <section style={{ flex: 1, position: 'relative' }}>
@@ -229,75 +138,7 @@ const App: React.FC = () => {
           </div>
         ) : (
           /* Mobile View */
-          <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Mobile Tabs */}
-            <div style={{
-              display: 'flex',
-              backgroundColor: 'var(--color-white)',
-              borderBottom: '1px solid var(--color-gray-200)',
-              boxShadow: 'var(--shadow-sm)',
-              zIndex: 5
-            }}>
-              <button
-                onClick={() => {
-                  setMobileView('chat');
-                  if ('vibrate' in navigator) navigator.vibrate(50);
-                }}
-                style={{
-                  flex: 1,
-                  padding: '14px 0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  color: mobileView === 'chat' ? 'var(--color-brand-blue)' : 'var(--color-gray-500)',
-                  borderBottom: `3px solid ${mobileView === 'chat' ? 'var(--color-brand-blue)' : 'transparent'}`,
-                  fontWeight: 700,
-                  transition: 'all 0.2s ease',
-                  background: 'none',
-                  border: 'none',
-                  outline: 'none'
-                }}
-              >
-                <MessageSquare size={18} />
-                CHAT
-              </button>
-              <button
-                onClick={() => {
-                  setMobileView('map');
-                  if ('vibrate' in navigator) navigator.vibrate(50);
-                }}
-                style={{
-                  flex: 1,
-                  padding: '14px 0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  color: mobileView === 'map' ? 'var(--color-brand-blue)' : 'var(--color-gray-500)',
-                  borderBottom: `3px solid ${mobileView === 'map' ? 'var(--color-brand-blue)' : 'transparent'}`,
-                  fontWeight: 700,
-                  transition: 'all 0.2s ease',
-                  background: 'none',
-                  border: 'none',
-                  outline: 'none'
-                }}
-              >
-                <MapIcon size={18} />
-                MAP
-                {routes.length > 0 && (
-                  <span style={{
-                    backgroundColor: 'var(--color-brand-blue)',
-                    color: 'white',
-                    borderRadius: '12px',
-                    padding: '2px 8px',
-                    fontSize: '10px',
-                    marginLeft: '4px'
-                  }}>{routes.length}</span>
-                )}
-              </button>
-            </div>
-
+          <div style={{ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '64px' }}>
             <div style={{ flex: 1, position: 'relative' }}>
               <AnimatePresence mode="wait">
                 {mobileView === 'chat' ? (
@@ -306,10 +147,16 @@ const App: React.FC = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-white)' }}
+                    style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg-primary)' }}
                   >
                     <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '20px' }}>
                       {messages.map(m => <MessageBubble key={m.id} message={m} />)}
+
+                      {/* Show Quick Actions if only the initial greeting exists */}
+                      {!isTyping && messages.length === 1 && (
+                        <QuickActions onAction={handleSendMessage} />
+                      )}
+
                       {isTyping && <LoadingState />}
                       {!isTyping && messages.length > 1 && (
                         <div style={{ padding: '0 var(--spacing-sm)' }}>
@@ -321,6 +168,7 @@ const App: React.FC = () => {
                               onSelect={(id) => {
                                 setSelectedRouteId(id);
                                 setMobileView('map');
+                                setActiveTab('map');
                                 if ('vibrate' in navigator) navigator.vibrate(50);
                               }}
                             />
@@ -354,39 +202,55 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Floating SOS Button */}
-        <motion.button
-          onClick={() => {
+        {/* Floating SOS Button - Desktop Only */}
+        {!isMobile && (
+          <motion.button
+            onClick={() => {
+              if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+              alert('SOS activated! Sharing location with campus police and emergency contacts.');
+            }}
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            style={{
+              position: 'absolute',
+              bottom: '32px',
+              right: '32px',
+              width: '64px',
+              height: '64px',
+              borderRadius: 'var(--radius-full)',
+              backgroundColor: 'var(--color-safety-100)',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 32px rgba(211, 47, 47, 0.4)',
+              zIndex: 2000,
+              fontWeight: 800,
+              fontSize: '14px',
+              border: '3px solid white',
+              cursor: 'pointer'
+            }}
+          >
+            SOS
+          </motion.button>
+        )}
+      </main>
+
+      {isMobile && (
+        <BottomNav
+          activeTab={activeTab}
+          onSOS={() => {
             if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
             alert('SOS activated! Sharing location with campus police and emergency contacts.');
           }}
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          style={{
-            position: 'absolute',
-            bottom: isMobile ? 'calc(var(--bottom-nav-height) + 24px)' : '32px',
-            right: '32px',
-            width: '64px',
-            height: '64px',
-            borderRadius: 'var(--radius-full)',
-            backgroundColor: 'var(--color-safety-100)',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 32px rgba(211, 47, 47, 0.4)',
-            zIndex: 2000,
-            fontWeight: 800,
-            fontSize: '14px',
-            border: '3px solid white',
-            cursor: 'pointer'
+          setActiveTab={(tab) => {
+            setActiveTab(tab);
+            if (tab === 'chat') setMobileView('chat');
+            if (tab === 'map') setMobileView('map');
+            if ('vibrate' in navigator) navigator.vibrate(50);
           }}
-        >
-          SOS
-        </motion.button>
-      </main>
-
-      {isMobile && <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />}
+        />
+      )}
     </div>
   );
 };

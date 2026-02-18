@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Iterable
 
 from ..db import get_conn
@@ -26,8 +26,9 @@ def is_within_campus(point: Coordinates) -> bool:
 
 
 def fetch_incidents(route: LineString, radius_m: int, days_back: int) -> list[Incident]:
+
     wkt = linestring_to_wkt(route)
-    cutoff = datetime.now(timezone.utc) - timedelta(days=days_back)
+    cutoff = datetime.utcnow() - timedelta(days=days_back)
 
     query = """
         WITH route AS (
@@ -36,8 +37,8 @@ def fetch_incidents(route: LineString, radius_m: int, days_back: int) -> list[In
         SELECT id::text AS id,
                incident_type AS type,
                date_occurred AS date,
-               description,
-               severity,
+               location_name AS description,
+               NULL AS severity,
                ST_Y(location_geo::geometry) AS lat,
                ST_X(location_geo::geometry) AS lon
         FROM crime_incidents, route
@@ -49,7 +50,7 @@ def fetch_incidents(route: LineString, radius_m: int, days_back: int) -> list[In
         SELECT offense_id::text AS id,
                nibrs_description AS type,
                report_date AS date,
-               incident_description AS description,
+               nibrs_description AS description,
                NULL AS severity,
                ST_Y(location_geo::geometry) AS lat,
                ST_X(location_geo::geometry) AS lon
@@ -76,36 +77,41 @@ def fetch_incidents(route: LineString, radius_m: int, days_back: int) -> list[In
     incidents: list[Incident] = []
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                query,
-                (
-                    wkt,
-                    cutoff,
-                    radius_m,
-                    cutoff,
-                    radius_m,
-                    cutoff,
-                    radius_m,
-                ),
-            )
-            for row in cur.fetchall():
-                incident_id, incident_type, date, description, severity, lat, lon = row
-                incidents.append(
-                    Incident(
-                        id=str(incident_id),
-                        type=normalize_incident_type(incident_type),
-                        location=Coordinates(latitude=lat, longitude=lon),
-                        date=date,
-                        description=description or "",
-                        severity=severity or "medium",
-                    )
+            try:
+                cur.execute(
+                    query,
+                    (
+                        wkt,
+                        cutoff,
+                        radius_m,
+                        cutoff,
+                        radius_m,
+                        cutoff,
+                        radius_m,
+                    ),
                 )
+                rows = cur.fetchall()
+                
+                for row in rows:
+                    incident_id, incident_type, date, description, severity, lat, lon = row
+                    incidents.append(
+                        Incident(
+                            id=str(incident_id),
+                            type=normalize_incident_type(incident_type),
+                            location=Coordinates(latitude=lat, longitude=lon),
+                            date=date,
+                            description=description or "",
+                            severity=severity or "medium",
+                        )
+                    )
+            except Exception as e:
+                raise e
     return incidents
 
 
 def fetch_traffic_stop_count(route: LineString, radius_m: int, days_back: int) -> int:
     wkt = linestring_to_wkt(route)
-    cutoff = datetime.now(timezone.utc) - timedelta(days=days_back)
+    cutoff = datetime.utcnow() - timedelta(days=days_back)
 
     query = """
         WITH route AS (
