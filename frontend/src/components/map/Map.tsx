@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import { useStore } from '../../hooks/useStore';
-import { createIncidentIcon, createEmergencyPhoneIcon, createClusterIcon } from './Markers';
+import { createIncidentIcon, createEmergencyPhoneIcon, createClusterIcon, createUserLocationIcon } from './Markers';
 import { getSafetyDetails } from '../../utils/formatters';
 import type { RankedRoute } from '../../types/route';
 import type { Incident, EmergencyPhone } from '../../types/incident';
@@ -207,7 +207,10 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
 
                 {userLocation && (
                     <>
-                        <Marker position={[userLocation.latitude, userLocation.longitude] as [number, number]}>
+                        <Marker
+                            position={[userLocation.latitude, userLocation.longitude] as [number, number]}
+                            icon={createUserLocationIcon()}
+                        >
                             <Popup>You are here</Popup>
                         </Marker>
                         <Circle

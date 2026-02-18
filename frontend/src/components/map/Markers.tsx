@@ -63,3 +63,24 @@ export const createClusterIcon = (count: number) => {
         iconAnchor: [18, 18],
     });
 };
+
+export const createUserLocationIcon = () => {
+    const iconHtml = renderToStaticMarkup(
+        <div style={{
+            backgroundColor: '#4285F4',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            border: '3px solid white',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+        }} />
+    );
+
+    return L.divIcon({
+        html: iconHtml,
+        className: 'user-location-marker',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+        popupAnchor: [0, -10]
+    });
+};
