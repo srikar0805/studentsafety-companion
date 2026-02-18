@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test Transit API</title>
+</head>
+
+<body>
+    <h1>Testing Transit Stops API</h1>
+    <button onclick="testTransitAPI()">Test API</button>
+    <div id="output"></div>
+
+    <script>
+        async function testTransitAPI() {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Testing...';
+
+            try {
+                // Test 1: Get routes
+                console.log('Fetching routes...');
+                const routesResponse = await fetch('http://localhost:8000/api/transit/routes');
+                const routesData = await routesResponse.json();
+                console.log('Routes:', routesData);
+
+                let html = `<h2>Routes (${routesData.routes.length})</h2>`;
+
+                // Test 2: Get stops for each route
+                const allStops = [];
+                for (const route of routesData.routes) {
+                    console.log(`Fetching stops for route ${route.id}...`);
+                    const stopsResponse = await fetch(`http://localhost:8000/api/transit/routes/${route.id}/stops`);
+                    const stopsData = await stopsResponse.json();
+                    console.log(`Route ${route.id} stops:`, stopsData);
+
+                    const validStops = stopsData.stops.filter(stop => stop.latitude && stop.longitude);
+                    html += `<p>${route.route_name}: ${validStops.length} stops with coords</p>`;
+
+                    allStops.push(...validStops.map(s => ({ ...s, route_name: route.route_name, route_color: route.route_color })));
+                }
+
+                html += `<h2>Total Stops: ${allStops.length}</h2>`;
+                html += '<h3>Sample Stops:</h3>';
+                allStops.slice(0, 5).forEach(stop => {
+                    html += `<p>${stop.stop_name}: (${stop.latitude}, ${stop.longitude}) - ${stop.route_name}</p>`;
+                });
+
+                output.innerHTML = html;
+
+                console.log('All stops:', allStops);
+                console.log('API TEST SUCCESS!');
+
+            } catch (error) {
+                output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                console.error('API TEST FAILED:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -192,4 +192,3 @@ CREATE TABLE IF NOT EXISTS route_cache (
 
 CREATE INDEX IF NOT EXISTS idx_route_origin ON route_cache(origin_lat, origin_lon);
 CREATE INDEX IF NOT EXISTS idx_route_expires ON route_cache(expires_at);
-

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(python:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c \"\nimport requests, json, sys\nsys.stdout.reconfigure\\(encoding=''utf-8''\\)\n\nURL = ''https://registry.archia.app/v1/responses''\nKEY = ''ask_FujOxF9rT5CEsDUUDKzHoDrGA8ZhPCA_ho2VcIA1Nak=''\nHDR = {''Authorization'': f''Bearer {KEY}'', ''Content-Type'': ''application/json''}\n\ndef extract\\(data\\):\n    for item in data.get\\(''output'', []\\):\n        if item.get\\(''type''\\) == ''message'':\n            for c in item.get\\(''content'', []\\):\n                if c.get\\(''type''\\) == ''output_text'':\n                    return c.get\\(''text'', ''''\\)[:300]\n    return ''NO TEXT FOUND''\n\nagents = [\n    \\(''Campus Dispatch Orchestrator'', ''Find safest route from Jesse Hall to Ellis Library''\\),\n    \\(''Campus Routing Engine'', json.dumps\\({''origin'': [38.9446, -92.3266], ''destination'': [38.9439, -92.3254], ''risk_weight'': 0.7, ''time_weight'': 0.3}\\)\\),\n    \\(''Campus risk and prediction engine'', ''Analyze safety for route near Jesse Hall at 10pm''\\),\n    \\(''campus context and journalism agent'', ''Search safety news near Jesse Hall, Mizzou campus''\\),\n]\n\nfor name, inp in agents:\n    print\\(f''--- {name} ---''\\)\n    r = requests.post\\(URL, json={''model'': f''agent:{name}'', ''input'': inp, ''stream'': False}, headers=HDR, timeout=60\\)\n    print\\(f''Status: {r.status_code}''\\)\n    if r.status_code == 200:\n        print\\(f''Response: {extract\\(r.json\\(\\)\\)}''\\)\n    else:\n        print\\(f''Error: {r.text[:200]}''\\)\n    print\\(\\)\n\")",
+      "Bash(PYTHONIOENCODING=utf-8 python:*)",
+      "Bash(timeout 10 uvicorn:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx vite build:*)",
+      "Bash(pkill:*)",
+      "Bash(for pid in 35296 66284 63912 81828 57100)",
+      "Bash(do)",
+      "Bash(done)",
+      "WebFetch(domain:catalog.data.gov)",
+      "WebFetch(domain:opendata.dc.gov)",
+      "WebFetch(domain:hub.arcgis.com)",
+      "WebFetch(domain:datahub-gocolumbiamo.opendata.arcgis.com)",
+      "WebFetch(domain:overpass-api.de)",
+      "WebFetch(domain:nominatim.openstreetmap.org)"
+    ]
+  }
+}

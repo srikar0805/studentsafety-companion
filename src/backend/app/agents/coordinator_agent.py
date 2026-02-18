@@ -1,0 +1,200 @@
+import logging
+from typing import Any, Dict
+
+from .base import BaseAgent
+from .intent_agent import IntentAgent
+from .route_agent import RouteAgent
+from .safety_agent import SafetyAgent
+from .context_agent import ContextAgent
+from ..services.locations import get_locations_by_category
+from ..schemas.agent_schemas import (
+    AgentFinalResponse, 
+    AgentRouteResponse,
+    AgentDisambiguationResponse,
+    LocationOption
+)
+
+logger = logging.getLogger("campus_dispatch")
+
+class CoordinatorAgent(BaseAgent):
+    def __init__(self):
+        super().__init__()
+        self.intent_agent = IntentAgent()
+        self.route_agent = RouteAgent()
+        self.safety_agent = SafetyAgent()
+        self.context_agent = ContextAgent()
+
+    async def run(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            intent = await self.intent_agent.run({"message": input_data.get("message")})
+        except Exception:
+            logger.exception("Intent agent failed")
+            return AgentFinalResponse(
+                routes=[],
+                explanation="I couldn't understand the request well enough to plan a route.",
+            ).model_dump()
+        
+        # Check if disambiguation is needed
+        if intent.get("needs_disambiguation"):
+            category = intent.get("category")
+            logger.info(f"Disambiguation needed for category: {category}")
+            
+            # Get all locations in the category
+            locations = get_locations_by_category(category, limit=10)
+            
+            if not locations:
+                return AgentFinalResponse(
+                    routes=[],
+                    explanation=f"I couldn't find any {category} locations on campus.",
+                ).model_dump()
+            
+            if len(locations) == 1:
+                # Only one option, use it automatically
+                logger.info(f"Only one {category} found, using automatically")
+                intent["destination_coords"] = locations[0].coordinates.model_dump()
+                # Continue with routing below
+            else:
+                # Multiple options, return disambiguation response
+                origin_coords = intent.get("origin_coords")
+                options = [
+                    LocationOption(
+                        name=loc.name,
+                        address=loc.address,
+                        coordinates=loc.coordinates,
+                        category=loc.category,
+                        distance_meters=None  # Could calculate distance from origin if available
+                    )
+                    for loc in locations
+                ]
+                
+                question = self._format_disambiguation_question(category, len(options))
+                
+                return AgentDisambiguationResponse(
+                    category=category,
+                    question=question,
+                    options=options
+                ).model_dump()
+
+        if not intent.get("origin_coords") or not intent.get("destination_coords"):
+            return AgentFinalResponse(
+                routes=[],
+                explanation="I need both an origin and a destination to plan a route.",
+            ).model_dump()
+
+        weights = self._select_weights(intent.get("priority", "balanced"))
+
+        try:
+            routes_data = await self.route_agent.run({**intent, **weights})
+        except Exception:
+            logger.exception("Route agent failed")
+            routes_data = {"routes": []}
+
+        routes_list = routes_data.get("routes", [])
+        if not routes_list:
+            return AgentFinalResponse(
+                routes=[],
+                explanation="I couldn't find any routes to your destination.",
+            ).model_dump()
+
+        try:
+            safety_data = await self.safety_agent.run(
+                {
+                    "routes": routes_list,
+                    "time": intent.get("time"),
+                    "mode": intent.get("mode"),
+                }
+            )
+        except Exception:
+            logger.exception("Safety agent failed")
+            safety_data = {"results": []}
+
+        try:
+            context_data = await self.context_agent.run({"routes": routes_list})
+        except Exception:
+            logger.exception("Context agent failed")
+            context_data = {"results": []}
+
+        safety_results = {r["route_id"]: r for r in safety_data.get("results", [])}
+        context_results = {r["route_id"]: r for r in context_data.get("results", [])}
+
+        final_routes = []
+        for r_dict in routes_list:
+            rid = r_dict["route_id"]
+            s_res = safety_results.get(rid, {"incident_probability": 0.5, "confidence": 0.5})
+            c_res = context_results.get(rid, {"summary": "No additional context."})
+
+            final_routes.append(
+                AgentRouteResponse(
+                    route_id=rid,
+                    eta=r_dict["eta_minutes"],
+                    risk=s_res["incident_probability"],
+                    confidence=s_res["confidence"],
+                    summary=c_res["summary"],
+                    geometry=r_dict["geometry"],
+                )
+            )
+
+        priority = intent.get("priority", "balanced")
+        if priority == "safety":
+            final_routes.sort(key=lambda x: x.risk)
+        elif priority == "speed":
+            final_routes.sort(key=lambda x: x.eta)
+        else:
+            final_routes.sort(key=lambda x: (x.risk * 0.6) + (x.eta / 30.0 * 0.4))
+
+        # Assign labels based on ranking
+        self._assign_route_labels(final_routes, priority)
+
+        explanation = (
+            f"I've found {len(final_routes)} routes. The recommended path is optimized for {priority}."
+        )
+        if final_routes:
+            explanation += f" {final_routes[0].summary}"
+
+        return AgentFinalResponse(routes=final_routes, explanation=explanation).model_dump()
+
+    def _assign_route_labels(self, routes: list, priority: str):
+        """Assign human-readable labels to ranked routes."""
+        if not routes:
+            return
+
+        # Find safest and fastest
+        safest = min(routes, key=lambda x: x.risk)
+        fastest = min(routes, key=lambda x: x.eta)
+
+        for i, route in enumerate(routes):
+            if i == 0:
+                # First route is always the recommended one (already sorted by priority)
+                if priority == "safety":
+                    route.label = "Safest Route (Recommended)"
+                elif priority == "speed":
+                    route.label = "Fastest Route (Recommended)"
+                else:
+                    route.label = "Best Overall (Recommended)"
+            elif route is safest and route is not fastest:
+                route.label = "Safest Route"
+            elif route is fastest and route is not safest:
+                route.label = "Fastest Route"
+            else:
+                route.label = "Alternative Route"
+
+    def _format_disambiguation_question(self, category: str, count: int) -> str:
+        """Format a natural question for disambiguation."""
+        category_labels = {
+            "dorm": "dorm",
+            "library": "library",
+            "dining": "dining hall",
+            "academic": "academic building",
+            "recreation": "recreation facility",
+            "parking": "parking location"
+        }
+        
+        label = category_labels.get(category, category)
+        return f"Which {label} would you like to go to?"
+    
+    def _select_weights(self, priority: str) -> Dict[str, float]:
+        if priority == "safety":
+            return {"risk_weight": 0.7, "time_weight": 0.3}
+        if priority == "speed":
+            return {"risk_weight": 0.3, "time_weight": 0.7}
+        return {"risk_weight": 0.5, "time_weight": 0.5}
