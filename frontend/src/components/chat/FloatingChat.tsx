@@ -255,29 +255,28 @@ export const FloatingChat: React.FC<FloatingChatProps> = ({
 
                 <InputArea onSendMessage={handleSendMessage} />
 
+                {/* Emergency Contact Bar - Bottom */}
                 <div
+                    onClick={() => window.open('tel:5738827201')}
                     style={{
-                        width: '100%',
+                        padding: '12px 24px',
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        padding: '16px 0 0 0',
+                        cursor: 'pointer',
+                        borderTop: '1px solid rgba(0,0,0,0.03)'
                     }}
                 >
-                    <span
-                        style={{
-                            color: 'red',
-                            fontWeight: 600,
-                            fontSize: '13px',
-                            letterSpacing: '0.5px',
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            userSelect: 'none',
-                        }}
-                        title="Click to refresh the page"
-                        onClick={() => window.location.reload()}
-                    >
-                        MUPD Emergency Number: 573-882-7201
+                    <span style={{
+                        color: '#dc2626',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        opacity: 0.8
+                    }}>
+                        MUPD Emergency: 573-882-7201
                     </span>
                 </div>
             </div>
