@@ -185,3 +185,4 @@ zipp==3.18.1
 
 # Data Update & Scheduling
 schedule==1.2.0
+psycopg[binary]
