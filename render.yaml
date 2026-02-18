@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: studentsafety-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: studentsafety-db
+          property: connectionString
+      - key: ARCHIA_API_KEY
+        sync: false
+      - key: OSRM_BASE_URL
+        value: https://router.project-osrm.org
+    plan: free
+    region: oregon
+
+databases:
+  - name: studentsafety-db
+    databaseName: studentsafety
+    user: studentsafety
+    plan: free
+    region: oregon
