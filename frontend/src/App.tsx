@@ -41,6 +41,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+    // Debug logging
+    console.log('🚀 App Mounted. Targeting Backend:', import.meta.env.VITE_API_URL || 'http://localhost:8000');
   }, [isDarkMode]);
 
   // Fetch routes for a specific destination (called after disambiguation resolves or for direct destinations)
@@ -135,10 +137,16 @@ const App: React.FC = () => {
       setShowModeSelector(true);
       setIsTyping(false);
       return;
+
     } catch (err) {
       console.error('Dispatch API error:', err);
       setIsTyping(false);
-      // Optionally, fallback to old behavior
+      addMessage({
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: '⚠️ Network Error: Could not connect to the backend. Please check your internet connection or try again later.',
+        timestamp: new Date()
+      });
     }
 
   };
