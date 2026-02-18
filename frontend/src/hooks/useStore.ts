@@ -1,10 +1,7 @@
 import { create } from 'zustand';
 import type { Message } from '../types/chat';
 import type { RankedRoute } from '../types/route';
-import { MOCK_ROUTES } from '../mocks/routes';
-import { MOCK_INCIDENTS, MOCK_PHONES } from '../mocks/incidents';
 import type { Incident, EmergencyPhone } from '../types/incident';
-
 interface AppState {
     // Chat
     messages: Message[];
@@ -36,8 +33,15 @@ interface AppState {
         incidents: boolean;
         phones: boolean;
         patrolZones: boolean;
+        shuttles: boolean;
+        heatmap: boolean;
+        infrastructure: boolean;
+        trafficSignals: boolean;
+        transitStops: boolean;
     };
-    toggleLayer: (layer: "routes" | "incidents" | "phones" | "patrolZones") => void;
+    toggleLayer: (layer: "routes" | "incidents" | "phones" | "patrolZones" | "shuttles" | "heatmap" | "infrastructure" | "trafficSignals" | "transitStops") => void;
+
+    // ...existing code...
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -73,6 +77,11 @@ export const useStore = create<AppState>((set) => ({
         incidents: true,
         phones: true,
         patrolZones: true,
+        shuttles: false,
+        heatmap: false,
+        infrastructure: false,
+        trafficSignals: true,
+        transitStops: true,
     },
     toggleLayer: (layer) => set((state) => ({
         layerVisibility: {
@@ -80,4 +89,6 @@ export const useStore = create<AppState>((set) => ({
             [layer]: !state.layerVisibility[layer]
         }
     })),
+
+    // ...existing code...
 }));

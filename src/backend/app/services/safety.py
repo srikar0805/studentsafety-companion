@@ -12,12 +12,16 @@ def calculate_base_score(incidents: list[Incident]) -> float:
 
 
 def apply_temporal_weight(incidents: list[Incident], current_time: datetime) -> float:
+    from datetime import timezone
     weighted_score = 0.0
     for incident in incidents:
         inc_date = incident.date
-        ct = current_time.replace(tzinfo=None) if current_time.tzinfo else current_time
-        if inc_date.tzinfo is not None:
-            inc_date = inc_date.replace(tzinfo=None)
+        ct = current_time
+        # Ensure both are timezone-aware (UTC)
+        if ct.tzinfo is None:
+            ct = ct.replace(tzinfo=timezone.utc)
+        if inc_date.tzinfo is None:
+            inc_date = inc_date.replace(tzinfo=timezone.utc)
         days_ago = (ct - inc_date).days
         if days_ago <= 30:
             weight = 5.0
@@ -140,16 +144,50 @@ def analyze_route_safety(
     patrol_frequency: str,
     user_mode: str,
     current_time: datetime,
+    route_length_m: float = 1.0,  # must be passed in by caller
 ) -> SafetyAnalysis:
-    base = calculate_base_score(incidents)
-    temporal = apply_temporal_weight(incidents, current_time)
-    time_adjusted = apply_time_multiplier(temporal, current_time)
-    final_score = apply_infrastructure_adjustments(
-        time_adjusted,
-        emergency_phones,
-        lighting_quality,
-        patrol_frequency,
-    )
+    # Step 1: Compute weighted incidents
+    from datetime import timezone
+    def compute_weighted_incidents(incidents, time_mult):
+        total = 0.0
+        for i in incidents:
+            ct = current_time
+            inc_date = i.date
+            # Ensure both are timezone-aware (UTC)
+            if ct.tzinfo is None:
+                ct = ct.replace(tzinfo=timezone.utc)
+            if inc_date.tzinfo is None:
+                inc_date = inc_date.replace(tzinfo=timezone.utc)
+            days_ago = (ct - inc_date).days
+            if days_ago <= 30:
+                temporal = 5
+            elif days_ago <= 90:
+                temporal = 2
+            else:
+                temporal = 1
+            total += 10 * temporal * time_mult
+        return total
+
+    hour = current_time.hour
+    is_night = hour >= 22 or hour < 6
+    time_mult = 2 if is_night else 1
+    weighted_incidents = compute_weighted_incidents(incidents, time_mult)
+    # Step 2: Density
+    density = weighted_incidents / max(route_length_m, 1)
+    # Step 3: Normalize
+    MAX_DENSITY = 0.08  # tune as needed
+    normalized = density / MAX_DENSITY
+    risk = normalized * 100
+
+    # Step 4: Infrastructure as percentage modifiers
+    if patrol_frequency == "high":
+        risk *= 0.8
+    if emergency_phones > 0:
+        risk *= 0.9
+    if lighting_quality == "poor":
+        risk *= 1.15
+
+    risk = round(min(risk, 100))
 
     concerns = build_concerns(incidents, lighting_quality, patrol_frequency)
     positives = build_positives(emergency_phones, incidents, patrol_frequency)
@@ -163,8 +201,8 @@ def analyze_route_safety(
         contributing.append("Lighting data not available; assuming moderate")
 
     return SafetyAnalysis(
-        risk_score=final_score,
-        risk_level=risk_level_label(final_score),
+        risk_score=risk,
+        risk_level=risk_level_label(risk),
         incident_count=len(incidents),
         recent_incidents=incidents,
         emergency_phones=emergency_phones,

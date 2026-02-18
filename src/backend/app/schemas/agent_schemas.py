@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-from ..models import Coordinates
+from ..models import Coordinates, CampusLocation, TransportationMode
 
 class AgentRequest(BaseModel):
     message: str
@@ -18,6 +18,9 @@ class IntentOutput(BaseModel):
     mode: str = "student"
     destination_coords: Optional[Coordinates] = None
     origin_coords: Optional[Coordinates] = None
+    transportation_mode: TransportationMode = TransportationMode.WALK
+    needs_disambiguation: bool = False
+    category: Optional[str] = None
 
 class RouteAgentInput(BaseModel):
     origin: Coordinates
@@ -55,6 +58,23 @@ class ContextAgentResult(BaseModel):
 class ContextAgentOutput(BaseModel):
     results: List[ContextAgentResult]
 
+class LocationOption(BaseModel):
+    """A location option for disambiguation"""
+    name: str
+    address: Optional[str] = None
+    coordinates: Coordinates
+    distance_meters: Optional[float] = None
+    category: str
+
+
+class AgentDisambiguationResponse(BaseModel):
+    """Response when disambiguation is needed"""
+    response_type: str = "disambiguation"
+    category: str
+    question: str
+    options: List[LocationOption]
+
+
 class AgentRouteResponse(BaseModel):
     route_id: str
     eta: float
@@ -62,7 +82,9 @@ class AgentRouteResponse(BaseModel):
     confidence: float
     summary: str
     geometry: Dict[str, Any]
+    label: str = ""  # "Safest Route (Recommended)", "Fastest Route", "Alternative Route"
 
 class AgentFinalResponse(BaseModel):
     routes: List[AgentRouteResponse]
     explanation: str
+    response_type: str = "routes"

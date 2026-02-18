@@ -12,7 +12,13 @@
       "Bash(pkill:*)",
       "Bash(for pid in 35296 66284 63912 81828 57100)",
       "Bash(do)",
-      "Bash(done)"
+      "Bash(done)",
+      "WebFetch(domain:catalog.data.gov)",
+      "WebFetch(domain:opendata.dc.gov)",
+      "WebFetch(domain:hub.arcgis.com)",
+      "WebFetch(domain:datahub-gocolumbiamo.opendata.arcgis.com)",
+      "WebFetch(domain:overpass-api.de)",
+      "WebFetch(domain:nominatim.openstreetmap.org)"
     ]
   }
 }

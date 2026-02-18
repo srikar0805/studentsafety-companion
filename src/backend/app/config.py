@@ -47,6 +47,6 @@ class Settings:
     phone_radius_m: int = int(os.getenv("PHONE_RADIUS_M", "100"))
     temporal_window_days: int = int(os.getenv("TEMPORAL_WINDOW_DAYS", "30"))
     traffic_window_days: int = int(os.getenv("TRAFFIC_WINDOW_DAYS", "90"))
-    max_route_alternatives: int = int(os.getenv("MAX_ROUTE_ALTERNATIVES", "2"))
+    max_route_alternatives: int = int(os.getenv("MAX_ROUTE_ALTERNATIVES", "3"))
 
 settings = Settings()

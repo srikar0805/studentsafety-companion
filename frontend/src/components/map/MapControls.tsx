@@ -20,7 +20,7 @@ export const ZoomControl: React.FC = () => {
     const map = useMap();
 
     return (
-        <div className="leaflet-top leaflet-right" style={{ marginTop: '120px' }}>
+        <div className="leaflet-top leaflet-right" style={{ marginTop: '190px' }}>
             <div className="leaflet-control map-custom-control" {...preventMapInteraction}>
                 <button
                     className="map-control-btn touch-optimized"
@@ -84,7 +84,7 @@ export const LocateControl: React.FC = () => {
     };
 
     return (
-        <div className="leaflet-top leaflet-right" style={{ marginTop: '230px' }}>
+        <div className="leaflet-top leaflet-right" style={{ marginTop: '310px' }}>
             <div className="leaflet-control map-custom-control" {...preventMapInteraction}>
                 <button
                     className="map-control-btn touch-optimized"
@@ -107,10 +107,16 @@ export const LayerControl: React.FC = () => {
         { id: 'incidents', label: 'Recent Incidents', icon: '⚠️' },
         { id: 'phones', label: 'Emergency Phones', icon: '📞' },
         { id: 'patrolZones', label: 'Patrol Zones', icon: '🛡️' },
+        { id: 'shuttles', label: 'Shuttle Tracker', icon: '🚌' },
+        { id: 'transitStops', label: 'Transit Stops', icon: '🚏' },
+        { id: 'heatmap', label: 'Crime Heatmap', icon: '🔴' },
+        { id: 'infrastructure', label: 'Infrastructure', icon: '🚦' },
+        { id: 'trafficSignals', label: 'Traffic Signals', icon: '🚦' },
     ] as const;
 
+
     return (
-        <div className="leaflet-top leaflet-right" style={{ marginTop: '300px' }}>
+        <div className="leaflet-top leaflet-right" style={{ marginTop: '380px' }}>
             <div className="leaflet-control map-custom-control" style={{ position: 'relative' }} {...preventMapInteraction}>
                 <button
                     className="map-control-btn touch-optimized"
@@ -191,7 +197,7 @@ export const FullscreenControl: React.FC = () => {
     };
 
     return (
-        <div className="leaflet-top leaflet-right" style={{ marginTop: '370px' }}>
+        <div className="leaflet-top leaflet-right" style={{ marginTop: '450px' }}>
             <div className="leaflet-control map-custom-control" {...preventMapInteraction}>
                 <button
                     className="map-control-btn touch-optimized"

@@ -5,6 +5,7 @@
 import type { RankedRoute } from '../types/route';
 import type { Incident } from '../types/incident';
 import type { Coordinates } from '../types/coordinates';
+import type { DisambiguationResponse } from '../types/disambiguation';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -13,7 +14,18 @@ export interface DispatchRequest {
 }
 
 export interface DispatchResponse {
-  response: string;
+  response?: string;
+  response_type?: 'routes' | 'disambiguation';
+  // Disambiguation fields
+  category?: string;
+  question?: string;
+  options?: Array<{
+    name: string;
+    address?: string;
+    coordinates: Coordinates;
+    distance_meters?: number;
+    category: string;
+  }>;
 }
 
 export interface RouteRequest {
@@ -24,6 +36,7 @@ export interface RouteRequest {
   time?: string;
   concerns?: string[];
   force_refresh?: boolean;
+  transportation_mode?: 'foot' | 'bike' | 'car' | 'bus';
 }
 
 export interface RoutesResponse {
@@ -83,7 +96,7 @@ export async function fetchRoutes(request: RouteRequest): Promise<RoutesResponse
  */
 export async function checkHealth(): Promise<{ status: string }> {
   const response = await fetch(`${API_BASE_URL}/health`);
-  
+
   if (!response.ok) {
     throw new Error(`Health check failed: ${response.status}`);
   }

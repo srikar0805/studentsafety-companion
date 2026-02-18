@@ -3,7 +3,7 @@ from __future__ import annotations
 import requests
 
 from ..config import settings
-from ..models import Coordinates, LineString, Route
+from ..models import Coordinates, LineString, Route, TransportationMode
 from ..utils import to_coordinates
 
 
@@ -14,11 +14,32 @@ class OsrmError(RuntimeError):
 def generate_routes(
     origin: Coordinates,
     destination: Coordinates,
+    mode: TransportationMode = TransportationMode.WALK,
     alternatives: int | None = None,
 ) -> list[Route]:
+    """
+    Generate routes using OSRM routing engine.
+    
+    Args:
+        origin: Starting coordinates
+        destination: Destination coordinates  
+        mode: Transportation mode (foot, bike, car)
+        alternatives: Number of alternative routes (defaults to config)
+        
+    Returns:
+        List of Route objects
+    """
+    # Map TransportationMode to OSRM profile
+    # Note: OSRM public demo only supports foot/car/bike
+    # BUS mode will be handled separately
+    if mode == TransportationMode.BUS:
+        mode = TransportationMode.WALK  # Fallback to walking for now
+    
+    mode_profile = mode.value  # "foot", "bike", or "car"
+    
     base = settings.osrm_base_url.rstrip("/")
     url = (
-        f"{base}/route/v1/foot/"
+        f"{base}/route/v1/{mode_profile}/"
         f"{origin.longitude},{origin.latitude};"
         f"{destination.longitude},{destination.latitude}"
     )

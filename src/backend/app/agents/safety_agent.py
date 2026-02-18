@@ -62,6 +62,7 @@ class SafetyAgent(BaseAgent):
                 patrol_frequency=patrol,
                 user_mode=user_mode,
                 current_time=current_time,
+                route_length_m=r_dict.get("distance_meters") or r_dict.get("distance") or 1.0,
             )
 
             results.append(

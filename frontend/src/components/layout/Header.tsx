@@ -1,6 +1,7 @@
 import React from 'react';
-import { Shield, Moon, Sun, HelpCircle, Settings } from 'lucide-react';
+import { Shield, Moon, Sun, HelpCircle, Settings, GraduationCap } from 'lucide-react';
 import { useResponsive } from '../../hooks/useResponsive';
+import { useStore } from '../../hooks/useStore';
 
 interface HeaderProps {
     isDarkMode: boolean;

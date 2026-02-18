@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import { useStore } from '../../hooks/useStore';
 import { MessageBubble } from './MessageBubble';
 import { InputArea } from './InputArea';
@@ -8,19 +9,70 @@ import { RouteCard } from './RouteCard';
 import { RouteComparisonView } from './RouteComparisonView';
 import { LoadingState } from '../shared/LoadingState';
 import { RouteCardSkeleton } from '../shared/Skeleton';
+import { DisambiguationDialog } from './DisambiguationDialog';
+import { TransportationModeSelector } from './TransportationModeSelector';
+import type { LocationOption, TransportationMode, DisambiguationResponse } from '../../types/disambiguation';
 
 interface FloatingChatProps {
     onSendMessage: (text: string) => Promise<void>;
+    disambiguationData?: DisambiguationResponse | null;
+    onDisambiguationSelect?: (location: LocationOption) => void;
+    onDisambiguationCancel?: () => void;
 }
 
-export const FloatingChat: React.FC<FloatingChatProps> = ({ onSendMessage }) => {
+export const FloatingChat: React.FC<FloatingChatProps> = ({
+    onSendMessage,
+    disambiguationData: externalDisambiguation,
+    onDisambiguationSelect,
+    onDisambiguationCancel,
+}) => {
     const {
         messages,
         isTyping,
         routes,
         selectedRouteId,
-        setSelectedRouteId
+        setSelectedRouteId,
+        addMessage,
+        setIsTyping
     } = useStore();
+
+    // Reset chat handler
+    const handleResetChat = () => {
+        addMessage({
+            id: '1',
+            role: 'assistant',
+            content: 'Hello! I am your Campus Dispatch Copilot. Where do you need to go safely today?',
+            timestamp: new Date(),
+        });
+        setIsTyping(false);
+    };
+
+    // State for mode selection
+    const [showModeSelector, setShowModeSelector] = useState(false);
+    const [selectedMode, setSelectedMode] = useState<TransportationMode>('foot');
+    const [pendingRequest, setPendingRequest] = useState<string | null>(null);
+
+    // Handle location selection from disambiguation
+    const handleLocationSelect = async (location: LocationOption) => {
+        if (onDisambiguationSelect) {
+            onDisambiguationSelect(location);
+        }
+    };
+
+    // Handle transportation mode selection
+    const handleModeSelect = async (mode: TransportationMode) => {
+        setSelectedMode(mode);
+        setShowModeSelector(false);
+
+        if (pendingRequest) {
+            await onSendMessage(`${pendingRequest} by ${mode}`);
+            setPendingRequest(null);
+        }
+    };
+
+    const handleSendMessage = async (text: string) => {
+        await onSendMessage(text);
+    };
 
     return (
         <motion.div
@@ -52,7 +104,8 @@ export const FloatingChat: React.FC<FloatingChatProps> = ({ onSendMessage }) => 
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: 'var(--color-bg-secondary)'
+                background: 'var(--color-bg-secondary)',
+                position: 'relative'
             }}>
                 <Shield size={20} color="var(--color-brand-blue)" fill="rgba(33, 150, 243, 0.1)" />
                 <span style={{
@@ -63,6 +116,29 @@ export const FloatingChat: React.FC<FloatingChatProps> = ({ onSendMessage }) => 
                 }}>
                     STUDENT SAFETY COMPANION
                 </span>
+                <button
+                    onClick={handleResetChat}
+                    style={{
+                        position: 'absolute',
+                        right: 12,
+                        top: 12,
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                        color: 'var(--color-text-muted)',
+                        width: 24,
+                        height: 24,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: 0.7,
+                        transition: 'opacity 0.2s',
+                    }}
+                    title="Reset chat"
+                >
+                    <RotateCcw size={18} />
+                </button>
             </div>
 
             {/* Messages Area */}
@@ -167,8 +243,55 @@ export const FloatingChat: React.FC<FloatingChatProps> = ({ onSendMessage }) => 
                 background: 'rgba(255,255,255,0.5)',
                 borderTop: '1px solid rgba(0,0,0,0.05)'
             }}>
-                <InputArea onSendMessage={onSendMessage} />
+                {/* Transportation Mode Selector (shown above input when needed) */}
+                {showModeSelector && (
+                    <div style={{ padding: 'var(--spacing-md)' }}>
+                        <TransportationModeSelector
+                            onSelectMode={handleModeSelect}
+                            selectedMode={selectedMode}
+                        />
+                    </div>
+                )}
+
+                <InputArea onSendMessage={handleSendMessage} />
+
+                <div
+                    style={{
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '16px 0 0 0',
+                    }}
+                >
+                    <span
+                        style={{
+                            color: 'red',
+                            fontWeight: 600,
+                            fontSize: '13px',
+                            letterSpacing: '0.5px',
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            userSelect: 'none',
+                        }}
+                        title="Click to refresh the page"
+                        onClick={() => window.location.reload()}
+                    >
+                        MUPD Emergency Number: 573-882-7201
+                    </span>
+                </div>
             </div>
+
+            {/* Disambiguation Dialog Overlay */}
+            {externalDisambiguation && (
+                <DisambiguationDialog
+                    category={externalDisambiguation.category}
+                    question={externalDisambiguation.question}
+                    options={externalDisambiguation.options}
+                    onSelectLocation={handleLocationSelect}
+                    onCancel={() => onDisambiguationCancel?.()}
+                />
+            )}
         </motion.div>
     );
 };

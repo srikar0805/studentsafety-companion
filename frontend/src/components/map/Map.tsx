@@ -9,8 +9,16 @@ import type { Incident, EmergencyPhone } from '../../types/incident';
 import { MapLegend } from './MapLegend';
 import { ConditionsBanner } from './ConditionsBanner';
 import { ZoomControl, LocateControl, FullscreenControl, LayerControl } from './MapControls';
+import ShuttleLayer from './ShuttleLayer';
+import RiskHeatmap from './RiskHeatmap';
+import InfrastructureLayer from './InfrastructureLayer';
+import TrafficSignalLayer from './TrafficSignalLayer';
+import { TransitStopsLayer } from './TransitStopsLayer';
+import type { TransitStop } from '../../types/transit';
 import 'leaflet/dist/leaflet.css';
 import './map.css';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 interface MapProps {
     routes: RankedRoute[];
@@ -23,6 +31,7 @@ interface MapProps {
 export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRouteId, incidents: rawIncidents, phones: rawPhones }) => {
     const { userLocation, layerVisibility, isDarkMode } = useStore();
     const [animatedPath, setAnimatedPath] = React.useState<[number, number][]>([]);
+    const [transitStops, setTransitStops] = React.useState<TransitStop[]>([]);
 
     useEffect(() => {
         if (!selectedRouteId) {
@@ -49,6 +58,47 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
 
         return () => clearInterval(interval);
     }, [selectedRouteId, routes]);
+
+    // Fetch transit stops when layer is visible
+    useEffect(() => {
+        console.log('[Transit] Layer visible:', layerVisibility.transitStops, 'Stops loaded:', transitStops.length);
+        if (layerVisibility.transitStops && transitStops.length === 0) {
+            const fetchTransitStops = async () => {
+                try {
+                    console.log('[Transit] Fetching routes from:', `${API_BASE}/api/transit/routes`);
+                    // Fetch all routes and their stops
+                    const routesResponse = await fetch(`${API_BASE}/api/transit/routes`);
+                    const routesData = await routesResponse.json();
+                    console.log('[Transit] Routes:', routesData);
+
+                    const allStops: TransitStop[] = [];
+                    for (const route of routesData.routes) {
+                        const stopsResponse = await fetch(`${API_BASE}/api/transit/routes/${route.id}/stops`);
+                        const stopsData = await stopsResponse.json();
+                        console.log(`[Transit] Route ${route.route_name} stops:`, stopsData.stops?.length);
+
+                        // Add stops with lat/lon (filter out null coordinates)
+                        const validStops = stopsData.stops
+                            .filter((stop: any) => stop.latitude != null && stop.longitude != null)
+                            .map((stop: any) => ({
+                                ...stop,
+                                route_name: route.route_name,
+                                route_color: route.route_color
+                            }));
+
+                        allStops.push(...validStops);
+                    }
+
+                    console.log('[Transit] Total valid stops:', allStops.length, allStops.slice(0, 2));
+                    setTransitStops(allStops);
+                } catch (error) {
+                    console.error('[Transit] Error fetching transit stops:', error);
+                }
+            };
+
+            fetchTransitStops();
+        }
+    }, [layerVisibility.transitStops, transitStops.length]);
 
     const center: [number, number] = userLocation
         ? [userLocation.latitude, userLocation.longitude]
@@ -203,46 +253,72 @@ export const Map: React.FC<MapProps> = ({ routes, selectedRouteId, setSelectedRo
                     })} />
                 ))}
 
-                {/* Clustered Incidents */}
-                {clusteredIncidents.map((node: any, idx) => (
-                    node.type === 'cluster' ? (
-                        <Marker key={`c-${idx}`} position={[node.data.latitude, node.data.longitude]} icon={createClusterIcon(node.count)} />
-                    ) : (
+                {/* Crime/Incident Markers (clustered) */}
+                {layerVisibility.incidents && clusteredIncidents.map((item, idx) => {
+                    if (item.type === 'cluster') {
+                        return (
+                            <Marker
+                                key={`cluster-${idx}`}
+                                position={[item.data.latitude, item.data.longitude] as [number, number]}
+                                icon={createClusterIcon(item.count!)}
+                            >
+                                <Popup>
+                                    <div style={{ fontSize: '12px' }}>
+                                        <strong>{item.count} incidents</strong> reported in this area
+                                    </div>
+                                </Popup>
+                            </Marker>
+                        );
+                    }
+                    const incident = item.data as Incident;
+                    return (
                         <Marker
-                            key={node.data.id}
-                            position={[node.data.location.latitude, node.data.location.longitude]}
-                            icon={createIncidentIcon() as any}
+                            key={`incident-${incident.id}`}
+                            position={[incident.location.latitude, incident.location.longitude] as [number, number]}
+                            icon={createIncidentIcon()}
                         >
                             <Popup>
-                                <div style={{ padding: '8px', minWidth: '200px' }}>
-                                    <h4 style={{ margin: 0, color: 'var(--color-safety-100)' }}>⚠️ {node.data.type}</h4>
-                                    <p style={{ margin: '8px 0', fontSize: '12px' }}>{node.data.description}</p>
-                                    <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
-                                        Reported: {new Date(node.data.date).toLocaleDateString()}
-                                    </div>
+                                <div style={{ fontSize: '12px' }}>
+                                    <strong>{incident.type}</strong>
+                                    <br />
+                                    {incident.description}
+                                    <br />
+                                    <span style={{ color: '#888' }}>{incident.date}</span>
                                 </div>
                             </Popup>
                         </Marker>
-                    )
-                ))}
+                    );
+                })}
 
-                {/* Emergency Phones */}
-                {layerVisibility.phones && rawPhones.map((phone, index) => (
+                {/* Emergency Phone Markers */}
+                {layerVisibility.phones && rawPhones.map((phone, idx) => (
                     <Marker
-                        key={phone.id ?? `phone-${index}`}
+                        key={`phone-${phone.id || idx}`}
                         position={[phone.location.latitude, phone.location.longitude] as [number, number]}
-                        icon={createEmergencyPhoneIcon() as any}
+                        icon={createEmergencyPhoneIcon()}
                     >
                         <Popup>
-                            <div style={{ padding: '8px' }}>
-                                <h4 style={{ margin: 0, color: 'var(--color-brand-blue)' }}>📞 Emergency Phone</h4>
-                                <p style={{ margin: '8px 0', fontSize: '12px' }}>
-                                    {phone.name ? `${phone.name} • ` : ''}Direct line to Security Dispatch.
-                                </p>
+                            <div style={{ fontSize: '12px' }}>
+                                <strong>{phone.name || 'Emergency Phone'}</strong>
                             </div>
                         </Popup>
                     </Marker>
                 ))}
+
+                {/* Shuttle routes, stops, and live positions */}
+                {layerVisibility.shuttles && <ShuttleLayer />}
+
+                {/* Crime/incident risk heatmap */}
+                {layerVisibility.heatmap && <RiskHeatmap />}
+
+                {/* Safety infrastructure (crosswalks, lights) */}
+                {layerVisibility.infrastructure && <InfrastructureLayer />}
+
+                {/* Real traffic signal locations from OpenStreetMap */}
+                {layerVisibility.trafficSignals && <TrafficSignalLayer />}
+
+                {/* Transit stops with schedules */}
+                {layerVisibility.transitStops && <TransitStopsLayer stops={transitStops} />}
             </MapContainer>
         </div>
     );

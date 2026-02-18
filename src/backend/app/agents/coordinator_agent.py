@@ -6,7 +6,13 @@ from .intent_agent import IntentAgent
 from .route_agent import RouteAgent
 from .safety_agent import SafetyAgent
 from .context_agent import ContextAgent
-from ..schemas.agent_schemas import AgentFinalResponse, AgentRouteResponse
+from ..services.locations import get_locations_by_category
+from ..schemas.agent_schemas import (
+    AgentFinalResponse, 
+    AgentRouteResponse,
+    AgentDisambiguationResponse,
+    LocationOption
+)
 
 logger = logging.getLogger("campus_dispatch")
 
@@ -27,6 +33,47 @@ class CoordinatorAgent(BaseAgent):
                 routes=[],
                 explanation="I couldn't understand the request well enough to plan a route.",
             ).model_dump()
+        
+        # Check if disambiguation is needed
+        if intent.get("needs_disambiguation"):
+            category = intent.get("category")
+            logger.info(f"Disambiguation needed for category: {category}")
+            
+            # Get all locations in the category
+            locations = get_locations_by_category(category, limit=10)
+            
+            if not locations:
+                return AgentFinalResponse(
+                    routes=[],
+                    explanation=f"I couldn't find any {category} locations on campus.",
+                ).model_dump()
+            
+            if len(locations) == 1:
+                # Only one option, use it automatically
+                logger.info(f"Only one {category} found, using automatically")
+                intent["destination_coords"] = locations[0].coordinates.model_dump()
+                # Continue with routing below
+            else:
+                # Multiple options, return disambiguation response
+                origin_coords = intent.get("origin_coords")
+                options = [
+                    LocationOption(
+                        name=loc.name,
+                        address=loc.address,
+                        coordinates=loc.coordinates,
+                        category=loc.category,
+                        distance_meters=None  # Could calculate distance from origin if available
+                    )
+                    for loc in locations
+                ]
+                
+                question = self._format_disambiguation_question(category, len(options))
+                
+                return AgentDisambiguationResponse(
+                    category=category,
+                    question=question,
+                    options=options
+                ).model_dump()
 
         if not intent.get("origin_coords") or not intent.get("destination_coords"):
             return AgentFinalResponse(
@@ -95,6 +142,9 @@ class CoordinatorAgent(BaseAgent):
         else:
             final_routes.sort(key=lambda x: (x.risk * 0.6) + (x.eta / 30.0 * 0.4))
 
+        # Assign labels based on ranking
+        self._assign_route_labels(final_routes, priority)
+
         explanation = (
             f"I've found {len(final_routes)} routes. The recommended path is optimized for {priority}."
         )
@@ -103,6 +153,45 @@ class CoordinatorAgent(BaseAgent):
 
         return AgentFinalResponse(routes=final_routes, explanation=explanation).model_dump()
 
+    def _assign_route_labels(self, routes: list, priority: str):
+        """Assign human-readable labels to ranked routes."""
+        if not routes:
+            return
+
+        # Find safest and fastest
+        safest = min(routes, key=lambda x: x.risk)
+        fastest = min(routes, key=lambda x: x.eta)
+
+        for i, route in enumerate(routes):
+            if i == 0:
+                # First route is always the recommended one (already sorted by priority)
+                if priority == "safety":
+                    route.label = "Safest Route (Recommended)"
+                elif priority == "speed":
+                    route.label = "Fastest Route (Recommended)"
+                else:
+                    route.label = "Best Overall (Recommended)"
+            elif route is safest and route is not fastest:
+                route.label = "Safest Route"
+            elif route is fastest and route is not safest:
+                route.label = "Fastest Route"
+            else:
+                route.label = "Alternative Route"
+
+    def _format_disambiguation_question(self, category: str, count: int) -> str:
+        """Format a natural question for disambiguation."""
+        category_labels = {
+            "dorm": "dorm",
+            "library": "library",
+            "dining": "dining hall",
+            "academic": "academic building",
+            "recreation": "recreation facility",
+            "parking": "parking location"
+        }
+        
+        label = category_labels.get(category, category)
+        return f"Which {label} would you like to go to?"
+    
     def _select_weights(self, priority: str) -> Dict[str, float]:
         if priority == "safety":
             return {"risk_weight": 0.7, "time_weight": 0.3}
