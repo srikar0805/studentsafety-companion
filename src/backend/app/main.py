@@ -32,6 +32,7 @@ logger = logging.getLogger("campus_dispatch")
 app = FastAPI(title="Campus Dispatch Copilot API")
 
 # CORS for frontend
+# CORS for frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
