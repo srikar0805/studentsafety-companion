@@ -10,8 +10,8 @@
 ---
 
 ## 🌐 Live Deployments
-* **Frontend Application:** https://studentsafety-companion-o9ji.vercel.app/
-* **Backend API:** [Insert Backend URL Here] 
+* **Frontend Application:** [https://studentsafety-companion-o9ji.vercel.app/](https://studentsafety-companion-o9ji.vercel.app/)
+
 
 ---
 
